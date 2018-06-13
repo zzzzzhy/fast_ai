@@ -21,3 +21,6 @@ RUN cd /build/ComputeLibrary/build && cp *.so *.a /usr/lib/
 RUN cd ComputeLibrary && \
     g++ acl_test.cc build/utils/*.o -O2 -std=c++11 -I. -Iinclude -Lbuild -larm_compute -larm_compute_graph -larm_compute_core -lOpenCL -o acl_test
 #RUN /build/ComputeLibrary/acl_test all
+
+ENV PYTHONPATH "/build/nnvm/python:/build/nnvm/tvm/python:/build/nnvm/tvm/topi/python"
+ADD benchmark /root/benchmark
