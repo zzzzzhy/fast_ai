@@ -1,0 +1,43 @@
+FROM debian:buster
+RUN apt-get update && apt-get install -y git scons cmake wget unzip curl build-essential libboost-all-dev
+WORKDIR /root
+RUN wget https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz && \
+    tar -xzvf protobuf-cpp-3.5.1.tar.gz && \
+    cd protobuf-3.5.1 && \
+    ./configure --prefix=/usr && \
+    make -j6 install
+
+#RUN wget https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.gz && \
+#    tar -zxf boost_1_64_0.tar.gz && \
+#    ls -alh && cd boost_1_64_0 && \
+#    ./bootstrap.sh --prefix=/usr --without-libraries=python && \
+#    ./b2 install -j 6
+
+ENV ARMNN_DIR /root/armnn
+
+RUN git clone https://github.com/Arm-software/armnn
+ENV TF_VER 1.5.1
+RUN cd /root && wget https://github.com/tensorflow/tensorflow/archive/v${TF_VER}.tar.gz && \
+    tar -zxvf v$TF_VER.tar.gz && \
+    cd /root/tensorflow-$TF_VER && \
+    ${ARMNN_DIR}/scripts/generate_tensorflow_protobuf.sh /root/v$TF_VER/protobuf /usr
+
+RUN cd /root && git clone https://github.com/jschmidt42/stb-cmake
+ADD ./Patchs/CMakeLists_tests.txt ${ARMNN_DIR}/tests/CMakeLists.txt
+ADD ./app/Stub_CMakeLists.txt ${ARMNN_DIR}/CMakeLists.txt
+RUN mkdir ${ARMNN_DIR}/app && touch ${ARMNN_DIR}/app/CMakeLists.txt
+RUN cd ${ARMNN_DIR} && mkdir build && cd build  && \
+    cmake -DBUILD_UNIT_TESTS=OFF -DTF_GENERATED_SOURCES=/root/v$TF_VER/protobuf -DBUILD_TF_PARSER=1 -DPROTOBUF_ROOT=/usr -DBUILD_TESTS=OFF -DTHIRD_PARTY_INCLUDE_DIRS="/root/stb-cmake" -DARMCOMPUTECL=OFF -DARMCOMPUTENEON=OFF ../
+
+RUN cd ${ARMNN_DIR}/build && make -j6
+
+### Start to build app ###
+
+ADD ./app/app ${ARMNN_DIR}/app
+ADD ./Patchs/TfParser.cpp ${ARMNN_DIR}/src/armnnTfParser/TfParser.cpp
+RUN cd ${ARMNN_DIR}/build && rm *.txt && \
+    cmake -DBUILD_UNIT_TESTS=OFF -DTF_GENERATED_SOURCES=/root/v$TF_VER/protobuf -DBUILD_TF_PARSER=1 -DPROTOBUF_ROOT=/usr -DBUILD_TESTS=OFF -DTHIRD_PARTY_INCLUDE_DIRS="/root/stb-cmake" -DARMCOMPUTECL=OFF -DARMCOMPUTENEON=OFF ../
+
+RUN cd ${ARMNN_DIR}/build && make -j6
+
+RUN cd ${ARMNN_DIR}/app && ../build/app/app

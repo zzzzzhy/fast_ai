@@ -1,0 +1,21 @@
+FROM arm32v7/debian:stretch
+RUN apt-get update && apt-get install -y git scons cmake libboost-all-dev wget unzip curl build-essential
+
+WORKDIR /usr
+RUN wget https://github.com/google/protobuf/releases/download/v3.5.1/protoc-3.5.1-linux-aarch_64.zip
+RUN unzip protoc-3.5.1-linux-aarch_64.zip
+RUN rm protoc-3.5.1-linux-aarch_64.zip
+
+WORKDIR /root
+RUN git clone https://github.com/Arm-software/armnn && \
+    git clone https://github.com/ARM-software/ComputeLibrary
+
+ENV ARMNN_DIR /root/armnn
+ENV CL_DIR /root/ComputeLibrary
+
+WORKDIR /root/ComputeLibrary
+RUN scons -j 6 neon=1 extra_cxx_flags="-fPIC" benchmark_tests=1 validation_tests=1
+
+ENV TF_VER 1.5.1
+ADD https://github.com/tensorflow/tensorflow/archive/v${TF_VER}.tar.gz /root/v${TF_VER}.tar.gz
+RUN tar -zxvf v$TF_VER.tar.gz

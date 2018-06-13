@@ -1,0 +1,30 @@
+FROM arm64v8/debian:stretch
+RUN apt-get update && apt-get install -y git scons cmake wget unzip curl build-essential
+WORKDIR /root
+RUN wget https://github.com/google/protobuf/releases/download/v3.5.1/protobuf-cpp-3.5.1.tar.gz && \
+    tar -xzvf protobuf-cpp-3.5.1.tar.gz && \
+    cd protobuf-3.5.1 && \
+    ./configure --prefix=/usr && \
+    make -j6 install
+
+RUN wget https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.gz && \
+    tar -zxf boost_1_64_0.tar.gz && \
+    ls -alh && cd boost_1_64_0 && \
+    ./bootstrap.sh --prefix=/usr --without-libraries=python && \
+    ./b2 install -j 6
+
+WORKDIR /root/
+RUN wget http://download.tensorflow.org/models/mobilenet_v1_2018_02_22/mobilenet_v1_1.0_224.tgz && \
+    tar -zxvf mobilenet_v1_1.0_224.tgz && \
+    mv mobilenet_v1_1.0_224_frozen.pb mobilenet_v1_1.0_224_fp32.pb
+
+ADD ./imgs /root/imgs
+ADD Mali/libmali-midgard-4th-r13p0.so /usr/lib/libmali.so
+RUN apt-get update && apt-get install -y libdrm2 libx11-xcb1 libxcb-dri2-0 && \
+    ln -s /usr/lib/libmali.so /usr/lib/libOpenCL.so && \
+    ln -s /usr/lib/libmali.so /usr/lib/libGLES_mali.so
+
+ADD ./export /root/export
+RUN echo "Please run on board: \
+    cd /root/export && ./TfMobileNet-Armnn -d /root/imgs --validation-file-in ./Validation.txt  --validation-file-out ./1.txt  -m ./ "
+

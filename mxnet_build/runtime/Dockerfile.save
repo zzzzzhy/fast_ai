@@ -1,0 +1,7 @@
+FROM arm64v8/ubuntu:16.04
+
+ADD ./assets/libmxnet.so /usr/lib/libmxnet.so
+ADD ./assets/mxnet-1.2.0-py2.py3-none-any.whl /root/mxnet-1.2.0-py2.py3-none-any.whl
+
+ADD test.py /test.py
+
