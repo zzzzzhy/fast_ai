@@ -66,7 +66,7 @@ sym = nnvm.sym.softmax(sym)
 ######################################################################
 # now compile the graph
 import nnvm.compiler
-target = 'llvm'
+target = 'llvm -target=aarch64-linux-gnu -mattr=+neon'
 shape_dict = {'data': x.shape}
 graph, lib, params = nnvm.compiler.build(sym, target, shape_dict, params=params)
 
@@ -75,7 +75,7 @@ graph, lib, params = nnvm.compiler.build(sym, target, shape_dict, params=params)
 # ---------------------------------
 # Now, we would like to reproduce the same forward computation using TVM.
 from tvm.contrib import graph_runtime
-ctx = tvm.cpu(0)
+ctx = tvm.gpu(0)
 dtype = 'float32'
 m = graph_runtime.create(graph, lib, ctx)
 # set inputs
