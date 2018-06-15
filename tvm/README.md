@@ -75,3 +75,11 @@ backend: TVM-mali	model: resnet18	dtype: float16	cost:0.1213
 backend: TVM-mali	model: mobilenet	dtype: float32	cost:0.0903
 backend: TVM-mali	model: mobilenet	dtype: float16	cost:0.0585
 ```
+
+# Use Remote RPC to run model on board, build on host(x86)
+
+## On Board to run rpc server
+```
+./run.sh solderzzc/rocketchat:tvm_06142018 /root/rpc_server.sh
+```
+

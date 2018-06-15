@@ -40,3 +40,4 @@ RUN ln -s /usr/lib/libmxnet.so /usr/local/lib/python2.7/dist-packages/mxnet/
 
 ADD benchmark /root/benchmark
 ADD from_mxnet.py /root/from_mxnet.py
+ADD ./rpc_server.sh /root/rpc_server.sh 
