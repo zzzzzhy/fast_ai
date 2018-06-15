@@ -66,15 +66,15 @@ sym = nnvm.sym.softmax(sym)
 ######################################################################
 # now compile the graph
 import nnvm.compiler
-from tvm.contrib import graph_runtime, util, ndk
+from tvm.contrib import graph_runtime, util
 
-target = 'llvm --system-lib -mcpu=cortex-a72 -target=aarch64-linux-gnu -mattr=+neon'
+target = 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon'
 shape_dict = {'data': x.shape}
 deploy_graph, lib, params = nnvm.compiler.build(sym, target, shape_dict, params=params)
 
 temp = util.tempdir()
-path_lib = "./deploy.so"
-lib.export_library(path_lib, ndk.create_shared)
+path_lib = "./deploy.tar"
+lib.export_library(path_lib)
 with open("./deploy.json", "w") as fo:
     fo.write(deploy_graph.json())
 with open("./deploy.params", "wb") as fo:

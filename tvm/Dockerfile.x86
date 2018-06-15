@@ -32,4 +32,4 @@ RUN TVM_NDK_CC=aarch64-linux-gnu-gcc python /root/from_mxnet.py && mkdir /export
 #RUN python /root/from_darknet.py
 
 ADD ./benchmark /root/benchmark
-RUN cd /root/benchmark && TVM_NDK_CC=aarch64-linux-gnu-gcc python mali_imagenet_bench_remote.py --target-host 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon' --host 192.168.0.10 --port 9090 --model all
+#RUN cd /root/benchmark && TVM_NDK_CC=aarch64-linux-gnu-gcc python mali_imagenet_bench_remote.py --target-host 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon' --host 192.168.0.10 --port 9090 --model all
