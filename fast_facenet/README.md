@@ -28,7 +28,7 @@ bash deploy2.sh
 
 ## Performance On GPU (ARM Mali)
 
-| Model        | Time Cost Per Frame | Memory Usage |
-| -------------|:-------------:| -----:|
-| High Speed Model | 0.054s | 150 MB |
-| High Acc Model | 0.580s | 750 MB |
+| Model        | Time Cost Per Frame | Memory Usage | CPU Usage |
+|:-----------:|:-------------------:| :-----------:|:---------:|
+| High Speed Model | 0.054s | 150 MB | 70% |
+| High Acc Model | 0.580s | 750 MB | 7% |
