@@ -8,6 +8,7 @@ RUN wget http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu
 RUN tar -xvf clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz --strip 1 && rm clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 
 WORKDIR /build
+RUN echo Commit 51836ba7456ea8cffd54d44104392ad19b7d97e6
 RUN git clone --recursive https://github.com/dmlc/tvm && cd tvm && \
     git submodule init && git submodule update
 RUN cd tvm && mkdir build && cd build && cmake -DUSE_LLVM=ON ../ && \
@@ -20,7 +21,7 @@ RUN apt-get install -y python-pip
 RUN pip install mxnet
 RUN apt-get install -y python-imaging
 RUN pip install Pillow
-RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+#RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
 ADD from_mxnet.py /root/from_mxnet.py
 RUN TVM_NDK_CC=aarch64-linux-gnu-gcc python /root/from_mxnet.py && mkdir /export && cp -rf ./deploy.* /export/ && ls -alh /export/
