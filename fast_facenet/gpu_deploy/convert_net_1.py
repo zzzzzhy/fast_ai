@@ -21,6 +21,8 @@ def convert(net, params, data_shape, dtype, target_host):
 
     lib.export_library('./net1.tar')
 
+    with open("./net1", "w") as fo:
+        fo.write(graph.json())
     with open("./net1.params", "wb") as fo:
         fo.write(nnvm.compiler.save_param_dict(params))
 
