@@ -9,7 +9,7 @@ loaded_lib = tvm.module.load('/root/net2.tar')
 # json graph
 loaded_json = open("/root/net2").read()
 # parameters in binary
-loaded_params = bytearray(open("/root/net2.params", "rb").read())
+loaded_params = bytearray(open("/root/params", "rb").read())
 
 ctx = tvm.cl(0)
 
@@ -20,7 +20,7 @@ a = np.random.uniform(size=(1,3,112,112)).astype('float32')
 
 mod.run(data=a)
 
-out = mod.get_output(0, tvm.nd.empty((128,)))
+out = mod.get_output(0, tvm.nd.empty((512,)))
 print(out)
 
 #for i in range(0,100):
