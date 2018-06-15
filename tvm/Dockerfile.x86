@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y python python-dev python-setuptools gcc
     git wget cmake build-essential unzip libedit-dev
 
 WORKDIR /usr
-RUN wget http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz 
+RUN wget http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 RUN tar -xvf clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz --strip 1 && rm clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 
 WORKDIR /build
@@ -20,5 +20,15 @@ RUN apt-get install -y python-pip
 RUN pip install mxnet
 RUN apt-get install -y python-imaging
 RUN pip install Pillow
+RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
 ADD from_mxnet.py /root/from_mxnet.py
-RUN python /root/from_mxnet.py
+RUN TVM_NDK_CC=aarch64-linux-gnu-gcc python /root/from_mxnet.py && mkdir /export && cp -rf ./deploy.* /export/ && ls -alh /export/
+
+#RUN apt-get install -y python-opencv
+#RUN pip install cffi
+#ADD from_darknet.py /root/from_darknet.py
+#RUN python /root/from_darknet.py
+
+ADD ./benchmark /root/benchmark
+RUN cd /root/benchmark && TVM_NDK_CC=aarch64-linux-gnu-gcc python mali_imagenet_bench_remote.py --target-host 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon' --host 192.168.0.10 --port 9090 --model all
