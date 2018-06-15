@@ -24,3 +24,11 @@ cd gpu_deploy
 cd gpu_deploy
 bash deploy2.sh
 ```
+
+
+## Performance On GPU (ARM Mali)
+
+| Model        | Time Cost Per Frame | Memory Usage |
+| -------------|:-------------:| -----:|
+| High Speed Model | 0.054s | 150 MB |
+| High Acc Model | 0.580s | 750 MB |
