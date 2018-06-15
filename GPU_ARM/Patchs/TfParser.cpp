@@ -1948,7 +1948,7 @@ void TfParser::LoadNodeDef(const tensorflow::NodeDef& nodeDef, const tensorflow:
 
     if (type != tensorflow::DT_FLOAT && nodeDef.op() != "Const")
     {
-        throw ParseException("Currently only FLOAT is supported for tensorflow nodes (apart from Const)");
+        throw ParseException(boost::str(boost::format("Currently only FLOAT is supported for tensorflow nodes (apart from Const) ( %1% %2% %3% )") % type % nodeDef.op() % nodeDef.name() ));
     }
 
     const std::string& operation = nodeDef.op();
