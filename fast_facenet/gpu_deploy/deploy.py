@@ -1,6 +1,7 @@
 import cv2
 import tvm
 import numpy as np
+import time
 
 from tvm.contrib import rpc, util, graph_runtime
 
@@ -18,7 +19,22 @@ mod.load_params(loaded_params)
 
 a = np.random.uniform(size=(1,3,112,112)).astype('float32')
 
+print("first run, need calc graph")
+
+start = time.time()
 mod.run(data=a)
+done = time.time()
+
+print('cost {}'.format(done-start))
+
+start = time.time()
+for i in range (1,1000):
+  step_start = time.time()
+  mod.run(data=a)
+  step_end = time.time()
+  print('step {} cost {}'.format(i,(step_end - step_start)))
+done = time.time()
+print('everage {}'.format((done - start)/1000))
 
 out = mod.get_output(0, tvm.nd.empty((128,)))
 print(out)
