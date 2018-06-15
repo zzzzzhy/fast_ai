@@ -7,6 +7,6 @@ docker run --rm --privileged \
      -v `pwd`/deploy.py:/root/deploy.py \
      -v `pwd`/export/net1.tar:/root/net1.tar \
      -v `pwd`/export/net1.params:/root/net1.params \
-     -v `pwd`/export/net1:/root/net \
+     -v `pwd`/export/net1:/root/net1 \
      -ti solderzzc/rocketchat:tvm_06142018 \
      /root/runtime_gpu.sh
