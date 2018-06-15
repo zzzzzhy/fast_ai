@@ -1,27 +1,43 @@
-FROM solderzzc/rocketchat:mxnet
-RUN apt-get install -y llvm-4.0 scons libopenblas-dev git cmake build-essential \
-    liblapack-dev libblas-dev libopencv-dev opencl-headers
+FROM solderzzc/rocketchat:mxnet_save
+RUN apt-get update && apt-get install -y llvm-4.0 scons libopenblas-dev git cmake build-essential \
+    liblapack-dev libblas-dev libopencv-dev opencl-headers python-setuptools python-pip libgfortran3 \
+    python-numpy python-scipy wget \
+    python-opencv
+
+RUN pip install --upgrade pip
 
 ADD Mali/libmali-midgard-4th-r13p0.so /usr/lib/libmali.so
 RUN ln -s /usr/lib/libmali.so /usr/lib/libOpenCL.so && \
     ln -s /usr/lib/libmali.so /usr/lib/libGLES_mali.so
 
 WORKDIR /build
-RUN git clone --recursive https://github.com/dmlc/nnvm.git && \
-    git clone https://github.com/ARM-software/ComputeLibrary.git --branch v17.12
-
-RUN cd nnvm/tvm && \
-    make USE_OPENCL=1  LLVM_CONFIG=llvm-config-4.0 -j4 && \
-    cd .. && make -j4
-
+RUN git clone https://github.com/ARM-software/ComputeLibrary.git --branch v18.05
 RUN cd ComputeLibrary && \
-    scons Werror=1 neon=1 opencl=1 examples=1 os=linux arch=arm64-v8a embed_kernels=1 build=native -j4
+    scons Werror=0 neon=1 opencl=1 examples=1 os=linux arch=arm64-v8a embed_kernels=1 build=native -j6
 ADD acl_test.cc /build/ComputeLibrary/acl_test.cc
 RUN cd /build/ComputeLibrary/build && cp *.so *.a /usr/lib/
-RUN cd ComputeLibrary && \
-    g++ acl_test.cc build/utils/*.o -O2 -std=c++11 -I. -Iinclude -Lbuild -larm_compute -larm_compute_graph -larm_compute_core -lOpenCL -o acl_test
-#RUN /build/ComputeLibrary/acl_test all
+#RUN cd ComputeLibrary && \
+#    g++ acl_test.cc build/utils/*.o -O2 -std=c++11 -I. -Iinclude -Lbuild -larm_compute -larm_compute_graph -larm_compute_core -lOpenCL -o acl_test
 
-ENV PYTHONPATH "/build/nnvm/python:/build/nnvm/tvm/python:/build/nnvm/tvm/topi/python"
+RUN git clone --recursive https://github.com/dmlc/tvm && apt-get install -y python-dev libtinfo-dev zlib1g-dev
+ADD config.cmake /build/tvm/build/config.cmake
+
+WORKDIR /build/tvm/build
+RUN cmake .. && make -j6
+
+ENV PYTHONPATH "/build/tvm/python:/build/tvm/topi/python:/build/tvm/nnvm/python:${PYTHONPATH}"
+WORKDIR /build/tvm
+
+RUN cd python; python setup.py install --user; cd .. && \
+    cd topi/python; python setup.py install --user; cd ../.. && \
+    cd nnvm/python; python setup.py install --user; cd ../..
+
+RUN wget https://bootstrap.pypa.io/get-pip.py -O get-pip.py && \
+    python get-pip.py --force-reinstall
+RUN pip install /root/mxnet-1.2.0-py2.py3-none-any.whl && rm /root/mxnet-1.2.0-py2.py3-none-any.whl
+
+RUN ln -s /usr/lib/libmxnet.so /usr/local/lib/python2.7/dist-packages/mxnet/
+
 ADD benchmark /root/benchmark
 ADD from_mxnet.py /root/from_mxnet.py
+ADD ./rpc_server.sh /root/rpc_server.sh 

@@ -41,7 +41,7 @@ cat result-acl.txt
 ```
 results are recored in `result-acl.txt`
 
-**Note** Some testcases (e.g. resnet) are missing because Arm Compute Library currently (v17.12) does not 
+**Note** Some testcases (e.g. resnet) are missing because Arm Compute Library currently (v17.12) does not
 support skip connection in its graph runtime. Also some testcases are too slow so that be skipped.
 
 # Performance Test Result on DEEPEYE Box
@@ -74,4 +74,29 @@ backend: TVM-mali	model: resnet18	dtype: float32	cost:0.1999
 backend: TVM-mali	model: resnet18	dtype: float16	cost:0.1213
 backend: TVM-mali	model: mobilenet	dtype: float32	cost:0.0903
 backend: TVM-mali	model: mobilenet	dtype: float16	cost:0.0585
+```
+
+# Use Remote RPC to run model on target, build on host(x86)
+
+## On Target to run RPC server
+```
+./run.sh solderzzc/rocketchat:tvm_06142018 /root/rpc_server.sh
+```
+
+## On Host to run convert
+```
+docker run -ti solderzzc/rocketchat:tvm_06142018_x86 /bin/bash
+
+cd /root/benchmark && TVM_NDK_CC=aarch64-linux-gnu-gcc python mali_imagenet_bench_remote.py --target-host 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon' --host 192.168.0.10 --port 9090 --model all
+```
+
+## Build Docker On Host
+```
+docker build -f Dockerfile.x86 -t solderzzc/rocketchat:tvm_06142018_x86 .
+```
+
+## Build Docker On Target
+```
+
+docker build -f Dockerfile -t solderzzc/rocketchat:tvm_06142018 .
 ```
