@@ -1,10 +1,8 @@
 import face_model
-import argparse
-import cv2
-import sys
-import numpy as np
-
-import time
+#import argparse
+#import sys
+#import time
+#import cv2
 
 parser = argparse.ArgumentParser(description='face model test')
 # general
@@ -18,27 +16,17 @@ parser.add_argument('--threshold', default=1.24, type=float, help='ver dist thre
 args = parser.parse_args()
 
 model = face_model.FaceModel(args)
-orig_img = cv2.imread('Tom_Hanks_54745.png')
+img = cv2.imread('Tom_Hanks_54745.png')
 
 start = time.time()
-img = model.get_input(orig_img)
+img = model.get_input(img)
 done = time.time()
-print('first face detection {}'.format(done - start))
-
-start = time.time()
-for i in range (1,1000):
-    step_start = time.time()
-    img = model.get_input(orig_img)
-    step_done = time.time()
-    print('step {} face detection {}'.format(i,(step_done - step_start)))
-
-done = time.time()
-print('face detection everage {}'.format((done - start)/100))
+print('face detection {}'.format(done - start))
 
 start = time.time()
 f1 = model.get_feature(img)
 done = time.time()
-print('first face recognition {}'.format(done - start))
+print('face recognition {}'.format(done - start))
 
 start = time.time()
 for i in range (1,100):
@@ -47,14 +35,4 @@ for i in range (1,100):
 done = time.time()
 print('face recognition everage {}'.format((done - start)/100))
 
-print(f1[0:10])
 
-img = cv2.imread('./2.png')
-img = model.get_input(img)
-f2 = model.get_feature(img)
-dist = np.sum(np.square(f1-f2))
-print(dist)
-sim = np.dot(f1, f2.T)
-print(sim)
-#diff = np.subtract(source_feature, target_feature)
-#dist = np.sum(np.square(diff),1)
