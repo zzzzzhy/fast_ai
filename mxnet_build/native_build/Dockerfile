@@ -1,21 +1,35 @@
-FROM arm64v8/ubuntu:16.04
+FROM arm64v8/ubuntu:18.04
 
-RUN  apt-get update -y && \
-     apt-get install -y \
-       build-essential git libatlas-base-dev libopencv-dev python-opencv \
-       libcurl4-openssl-dev libgtest-dev cmake wget unzip liblapack-dev clang \  
-       python-dev python-setuptools python-pip libgfortran3  python-numpy python-scipy wget
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install -y build-essential git libatlas-base-dev  libblas-dev libopencv-dev \
+    python-pip python-dev python-numpy python-scipy scons
+
 RUN pip install --upgrade pip
 
-WORKDIR /build
-RUN git clone --recursive https://github.com/apache/incubator-mxnet -b v1.2.0
-#ADD ./config.mk /build/incubator-mxnet/config.mk
-RUN cd incubator-mxnet && git checkout 1.2.0 && \
-    make USE_OPENCV=1 USE_BLAS=atlas ARCH=aarch64 USE_F16C=0 USE_OPERATOR_TUNING=1 USE_LAPACK=1 USE_OPENMP=1 
-    # CC=clang CXX=clang++
-RUN cd /build/incubator-mxnet/python && \
-    pip install -e .
+WORKDIR /build/
 
-ADD test.py /test.py
-RUN python /test.py
+RUN apt-get install -y wget
 
+RUN wget ftp://ftp.openailab.net/tools/package/AID-tools.tar.gz && \
+  git clone --recursive https://github.com/OAID/MXNet-HRT.git && \
+  tar -xvf AID-tools.tar.gz -C /usr/local && \
+  /usr/local/AID/gen-pkg-config-pc.sh /usr/local/AID
+
+ADD Mali/libmali-midgard-4th-r13p0.so /usr/lib/libmali.so
+RUN ln -s /usr/lib/libmali.so /usr/lib/libOpenCL.so && \
+    ln -s /usr/lib/libmali.so /usr/lib/libGLES_mali.so && \
+    apt-get install -y libopenblas-dev
+
+WORKDIR  /build/MXNet-HRT
+ADD ./config.mk.acl /build/MXNet-HRT
+RUN make -j3
+RUN make install
+
+WORKDIR /build/MXNet-HRT 
+RUN cd python && python setup.py install && \
+    apt-get install -y python-opencv python-sklearn python-skimage && \
+    rm -rf /build/MXNet-HRT
+
+WORKDIR /root
+
+#RUN cd example/image-classification/predict-cpp && USE_ACL=1 make -j6
