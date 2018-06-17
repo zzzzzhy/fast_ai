@@ -35,3 +35,14 @@ bash deploy2.sh
 |:-----------:|:-------------------:| :-----------:|:---------:|
 | High Speed Model | 0.054s | 150 MB | 70% |
 | High Acc Model | 0.580s | 750 MB | 7% |
+
+
+# How to run benchmark on Board
+
+## CPU version High SPEED
+```
+cd fast_facenet
+./run.sh solderzzc/rocketchat:mxnet
+cd ~/test/deploy
+python test.py ../model-y1-test2/model,0
+```
