@@ -12,7 +12,7 @@
 | High Speed Model | 0.20s | 191 MB | 600% |
 | High Acc Model | 1.60s | 758 MB | 600% |
 
-
+![wechatimg547](https://user-images.githubusercontent.com/3085564/41512352-0e1e327c-723c-11e8-9e47-fb6915c406c0.jpeg)
 
 # How to run ARM Mali benchmark
 ## Compile High Speed Model into Runtime
