@@ -62,7 +62,3 @@ apt-get install -y python-opencv python-sklearn python-skimage
 pip install -r requirements.txt
 python test_feature.py --model ../model-r50-am-lfw/model,0
 ```
-
-# CPU Version (ARM ASM)
-## Run fast facenet on Embedded board
-`docker build .`
