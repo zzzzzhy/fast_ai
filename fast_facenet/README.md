@@ -1,4 +1,7 @@
 # Benchmark Result
+
+<img src="https://user-images.githubusercontent.com/3085564/41512405-b5d1c024-723c-11e8-9ae1-cbfb7605d760.png" width="580">
+
 ## Performance On GPU (ARM Mali)
 
 | Model        | Time Cost Per Frame | Memory Usage | CPU Usage |
@@ -11,8 +14,6 @@
 |:-----------:|:-------------------:| :-----------:|:---------:|
 | High Speed Model | 0.20s | 191 MB | 600% |
 | High Acc Model | 1.60s | 758 MB | 600% |
-
-<img src="https://user-images.githubusercontent.com/3085564/41512405-b5d1c024-723c-11e8-9ae1-cbfb7605d760.png" width="580">
 
 # How to run ARM Mali benchmark
 ## Compile High Speed Model into Runtime
