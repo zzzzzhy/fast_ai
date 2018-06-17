@@ -42,9 +42,21 @@ bash deploy2.sh
 ## CPU version High SPEED
 ```
 cd fast_facenet
+git checkout f7c89abbf5dbc1f7b64c4b069bfcb025c2fac452
 ./run.sh solderzzc/rocketchat:mxnet
 cd ~/test/deploy
 apt-get install -y python-opencv python-sklearn python-skimage
 pip install -r requirements.txt
-python test.py --model ../model-y1-test2/model,0
+python test_feature.py --model ../model-y1-test2/model,0
+```
+
+## CPU version High Accurate
+```
+cd fast_facenet
+git checkout f7c89abbf5dbc1f7b64c4b069bfcb025c2fac452
+./run.sh solderzzc/rocketchat:mxnet
+cd ~/test/deploy
+apt-get install -y python-opencv python-sklearn python-skimage
+pip install -r requirements.txt
+python test_feature.py --model ../model-r50-am-lfw/model,0
 ```
