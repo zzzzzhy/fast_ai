@@ -44,5 +44,7 @@ bash deploy2.sh
 cd fast_facenet
 ./run.sh solderzzc/rocketchat:mxnet
 cd ~/test/deploy
-python test.py ../model-y1-test2/model,0
+apt-get install -y python-opencv python-sklearn python-skimage
+pip install -r requirements.txt
+python test.py --model ../model-y1-test2/model,0
 ```
