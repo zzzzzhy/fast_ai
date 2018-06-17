@@ -26,9 +26,9 @@ RUN make -j3
 RUN make install
 
 WORKDIR /build/MXNet-HRT 
-RUN cd python && python setup.py install && \
-    apt-get install -y python-opencv python-sklearn python-skimage && \
-    rm -rf /build/MXNet-HRT
+#RUN cd python && python setup.py install && \
+#    apt-get install -y python-opencv python-sklearn python-skimage && \
+#    rm -rf /build/MXNet-HRT
 
 WORKDIR /root
 
