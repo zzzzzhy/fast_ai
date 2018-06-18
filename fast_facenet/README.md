@@ -40,7 +40,7 @@ bash deploy2.sh
 ```
 ![Run On Target 2](https://user-images.githubusercontent.com/3085564/41492257-c2b19f52-70b2-11e8-89ec-818b45ed9185.png)
 
-# How to run CPU benchmark
+# How to run CPU benchmark (Original Framework 1.2.0)
 ## CPU version High SPEED
 ```
 cd fast_facenet
@@ -50,6 +50,7 @@ cd ~/test/deploy
 apt-get install -y python-opencv python-sklearn python-skimage
 pip install -r requirements.txt
 python test_feature.py --model ../model-y1-test2/model,0
+python test_detection.py --model ../model-y1-test2/model,0
 ```
 
 ## CPU version High Accurate
@@ -61,4 +62,26 @@ cd ~/test/deploy
 apt-get install -y python-opencv python-sklearn python-skimage
 pip install -r requirements.txt
 python test_feature.py --model ../model-r50-am-lfw/model,0
+python test_detection.py --model ../model-y1-test2/model,0
+```
+# How to run GPU benchmark (Original Framework 0.11.0, Detection Only)
+## GPU version with Profile
+```
+cd fast_facenet
+git checkout f7c89abbf5dbc1f7b64c4b069bfcb025c2fac452
+./run.sh solderzzc/rocketchat:mxnet_mali
+cd ~/test/deploy
+apt-get install -y python-opencv python-sklearn python-skimage
+pip install -r requirements.txt
+python test_detection.py --model ../model-y1-test2/model,0
+```
+## GPU version without Profile
+```
+cd fast_facenet
+git checkout f7c89abbf5dbc1f7b64c4b069bfcb025c2fac452
+./run.sh solderzzc/rocketchat:mxnet_mali_no_profile
+cd ~/test/deploy
+apt-get install -y python-opencv python-sklearn python-skimage
+pip install -r requirements.txt
+python test_detection.py --model ../model-y1-test2/model,0
 ```
