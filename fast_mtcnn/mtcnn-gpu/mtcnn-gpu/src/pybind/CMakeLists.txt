@@ -2,6 +2,7 @@ message(STATUS "============pybind module===========")
 
 include_directories( ${OpenCV_INCLUDE_DIRS}
                     ${PROJECT_SOURCE_DIR}/include
+                    ${PROJECT_SOURCE_DIR}/3rdparty/include
                    )
 
 link_directories(${PROJECT_SOURCE_DIR}/lib ${PROJECT_SOURCE_DIR}/3rdparty/lib)
