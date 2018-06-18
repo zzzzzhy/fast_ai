@@ -1,4 +1,7 @@
-3rdparty/lib/
-bin/
 build/
-lib/
+dist/
+_build/
+_generate/
+*.so
+*.py[cod]
+*.egg-info
