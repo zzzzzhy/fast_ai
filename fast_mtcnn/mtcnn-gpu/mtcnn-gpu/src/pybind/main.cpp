@@ -29,7 +29,7 @@ std::string detect(void){
     cv::Mat frame = cv::imread(fpath);
     if (!frame.data) {
         std::cerr << "failed to read image file: " << fpath << std::endl;
-        return "{'result':[]}"
+        return "{'result':[]}";
     }
     p_mtcnn->Detect(frame,face_info);
 /*face id: 0. box: (10.1071, 5.79927)
@@ -59,15 +59,15 @@ landmark:  (34.78728 47.97876) (73.28166 47.96395) (58.63026 75.06228) (36.07978
         if (i != 0){
           result << ",";
         }
-        result <<   "{ score :" << box.score << ","
-        result <<   "   bbox  : [" << box.x0 << "," << box.y0 "," << box.x1 <<","<<box.y1<<"],";
-        retult <<   "   landmark:[ "
-        result <<   "        [" << box.landmark.x[0] << "," << box.landmark.y[0] "] ,"
-        result <<   "        [" << box.landmark.x[1] << "," << box.landmark.y[1] "] ,"
-        result <<   "        [" << box.landmark.x[2] << "," << box.landmark.y[2] "] ,"
-        result <<   "        [" << box.landmark.x[3] << "," << box.landmark.y[3] "] ,"
-        result <<   "        [" << box.landmark.x[4] << "," << box.landmark.y[4] "] ,"
-        result <<   "   ]"
+        result <<   "{ score :" << box.score << ",";
+        result <<   "   bbox  : [" << box.x0 << "," << box.y0 << "," << box.x1 <<","<<box.y1<<"],";
+        result <<   "   landmark:[ ";
+        result <<   "        [" << box.landmark.x[0] << "," << box.landmark.y[0] << "] ,";
+        result <<   "        [" << box.landmark.x[1] << "," << box.landmark.y[1] << "] ,";
+        result <<   "        [" << box.landmark.x[2] << "," << box.landmark.y[2] << "] ,";
+        result <<   "        [" << box.landmark.x[3] << "," << box.landmark.y[3] << "] ,";
+        result <<   "        [" << box.landmark.x[4] << "," << box.landmark.y[4] << "] ,";
+        result <<   "   ]";
         result <<   "}"; // score
 
         std::ostringstream oss;
@@ -101,9 +101,9 @@ landmark:  (34.78728 47.97876) (73.28166 47.96395) (58.63026 75.06228) (36.07978
             cv::circle(frame, cv::Point(box.landmark.x[l],box.landmark.y[l]), 2, cv::Scalar(0, 0, 255), 2);
         }
     }
-    result << "]}"
-    cout << result;
-    return result;
+    result << "]}";
+    std::cout << result.str();
+    return result.str();
 }
 
 std::string test(void) {
