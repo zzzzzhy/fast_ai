@@ -9,9 +9,6 @@
 
 #include "mtcnn.hpp"
 #include "utils.hpp"
-#include "json.hpp"
-
-using json = nlohmann::json;
 
 std::string type = "mxnet";
 std::string fpath = "test.jpg";
@@ -53,20 +50,20 @@ landmark:  (34.78728 47.97876) (73.28166 47.96395) (58.63026 75.06228) (36.07978
 }
 */
     std::ostringstream result;
-    result << "{'result':[";
+    result << "{\"result\":[";
     for(unsigned int i = 0; i < face_info.size(); i++) {
         face_box& box = face_info[i];
         if (i != 0){
           result << ",";
         }
-        result <<   "{ score :" << box.score << ",";
-        result <<   "   bbox  : [" << box.x0 << "," << box.y0 << "," << box.x1 <<","<<box.y1<<"],";
-        result <<   "   landmark:[ ";
+        result <<   "{ \"score\" :" << box.score << ",";
+        result <<   "   \"bbox\"  : [" << box.x0 << "," << box.y0 << "," << box.x1 <<","<<box.y1<<"],";
+        result <<   "   \"landmark\":[ ";
         result <<   "        [" << box.landmark.x[0] << "," << box.landmark.y[0] << "] ,";
         result <<   "        [" << box.landmark.x[1] << "," << box.landmark.y[1] << "] ,";
         result <<   "        [" << box.landmark.x[2] << "," << box.landmark.y[2] << "] ,";
         result <<   "        [" << box.landmark.x[3] << "," << box.landmark.y[3] << "] ,";
-        result <<   "        [" << box.landmark.x[4] << "," << box.landmark.y[4] << "] ,";
+        result <<   "        [" << box.landmark.x[4] << "," << box.landmark.y[4] << "]";
         result <<   "   ]";
         result <<   "}"; // score
 
@@ -102,7 +99,8 @@ landmark:  (34.78728 47.97876) (73.28166 47.96395) (58.63026 75.06228) (36.07978
         }
     }
     result << "]}";
-    std::cout << result.str();
+    std::cout << "json string return value:" <<  result.str() << "\n";
+
     return result.str();
 }
 
