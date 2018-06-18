@@ -19,8 +19,8 @@ docker build .
 
 # Prebuilt Docker List
 
-| Docker Tag | MXNet Version | With GPU |
-|:----------:|:-------------:|:--------:|
-|solderzzc/rocketchat:mxnet| 1.2.0 | ❌ |
-|solderzzc/rocketchat:mxnet_mali|0.11.0|✅|
-|solderzzc/rocketchat:mxnet_mali_no_profile|0.11.0|✅|
+| Docker Tag | MXNet Version | With GPU | Verify |
+|:----------:|:-------------:|:--------:|:--------:|
+|solderzzc/rocketchat:mxnet| 1.2.0 | ❌ | [face feature/detection](https://github.com/solderzzc/fast_ai/tree/master/fast_facenet#how-to-run-cpu-benchmark) |
+|solderzzc/rocketchat:mxnet_mali|0.11.0|✅|[face detection](https://github.com/solderzzc/fast_ai/blob/master/fast_facenet/README.md#gpu-version-with-profile)|
+|solderzzc/rocketchat:mxnet_mali_no_profile|0.11.0|✅|[face detection](https://github.com/solderzzc/fast_ai/blob/master/fast_facenet/README.md#gpu-version-without-profile)|
