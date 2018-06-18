@@ -1,12 +1,17 @@
-#include <pybind11/pybind11.h>
 #include <unistd.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include "mtcnn.hpp"
 
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+#include "mtcnn.hpp"
 #include "utils.hpp"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 std::string type = "mxnet";
 std::string fpath = "test.jpg";
@@ -17,6 +22,19 @@ bool save_chop = false;//true;
 Mtcnn * p_mtcnn;
 // = new MxNetMtcnn();
 // mtcnn->LoadModule(model_dir);
+std::string detect(void){
+    
+    std::vector<face_box> face_info;  
+
+    cv::Mat frame = cv::imread(fpath);
+    if (!frame.data) {
+        std::cerr << "failed to read image file: " << fpath << std::endl;
+    }
+    p_mtcnn->Detect(frame,face_info);
+
+    std::cout << j << std::endl;
+
+}
 
 std::string test(void) {
     
@@ -99,6 +117,10 @@ PYBIND11_MODULE(face_detection, m) {
 
     m.def("load", &load, R"pbdoc(
         load and init mtcnn
+    )pbdoc");
+
+    m.def("detect", &detect, R"pbdoc(
+        test detect function
     )pbdoc");
 
     m.def("subtract", [](int i, int j) { return i - j; }, R"pbdoc(
