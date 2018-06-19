@@ -3,8 +3,8 @@
 # Build And run Docker Image
 
 ```
-docker build -t solderzzc/rockchat:tvm .
-./run.sh solderzzc/rockchat:tvm
+docker build -t solderzzc/rocketchat:tvm .
+./run.sh solderzzc/rocketchat:tvm
 ```
 
 # Set Test Environment in Docker container
