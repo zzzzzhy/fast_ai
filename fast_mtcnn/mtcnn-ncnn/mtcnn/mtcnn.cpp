@@ -397,10 +397,20 @@ int main(int argc, char** argv)
     ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(cv_img.data, ncnn::Mat::PIXEL_BGR2RGB, cv_img.cols, cv_img.rows);
     struct timeval  tv1,tv2;
     struct timezone tz1,tz2;
-    gettimeofday(&tv1,&tz1);
-    mm.detect(ncnn_img, finalBbox);
-    gettimeofday(&tv2,&tz2);
-    printf( "%s = %g ms \n ", "Detection All time", getElapse(&tv1, &tv2) );
+
+    struct timeval  tv3,tv4;
+    struct timezone tz3,tz4;
+
+    gettimeofday(&tv3,&tz3);
+    int total_count = 1000;
+    for(int i = 0; i<total_count; i++){
+      gettimeofday(&tv1,&tz1);
+      mm.detect(ncnn_img, finalBbox);
+      gettimeofday(&tv2,&tz2);
+      printf( "%s = %g ms \n ", "Detection All time", getElapse(&tv1, &tv2) );
+    }
+    gettimeofday(&tv4,&tz4);
+    printf( "%s = %g ms \n ", "Detection Everage time", getElapse(&tv3, &tv4)/total_count );
 
     int total = 0;
     for(vector<Bbox>::iterator it=finalBbox.begin(); it!=finalBbox.end();it++){
@@ -413,7 +423,7 @@ int main(int argc, char** argv)
 
     std::cout << "totol detect " << total << " persons" << std::endl;
     //cv::imwrite("result.jpg",cv_img);
-    imshow("face_detection", cv_img);
-    cv::waitKey(0);
+    //imshow("face_detection", cv_img);
+    //cv::waitKey(0);
     return 0;
 }
