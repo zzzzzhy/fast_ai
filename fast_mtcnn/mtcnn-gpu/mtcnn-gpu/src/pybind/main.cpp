@@ -12,24 +12,24 @@
 
 std::string type = "mxnet";
 std::string fpath = "test.jpg";
-std::string model_dir = "../models";
+//std::string model_dir = "../models";
 std::string out_dir = "../outputs";
-bool save_chop = false;//true;
+bool save_chop = true;
 
 Mtcnn * p_mtcnn;
-// = new MxNetMtcnn();
-// mtcnn->LoadModule(model_dir);
-std::string detect(void){
+
+std::string detect(std::string img_path, std::string out_dir){
 
     std::vector<face_box> face_info;
 
-    cv::Mat frame = cv::imread(fpath);
+    cv::Mat frame = cv::imread(img_path);
     if (!frame.data) {
         std::cerr << "failed to read image file: " << fpath << std::endl;
         return "{'result':[]}";
     }
     p_mtcnn->Detect(frame,face_info);
-/*face id: 0. box: (10.1071, 5.79927)
+/*
+face id: 0. box: (10.1071, 5.79927)
 face 0: x0,y0 10.10714 5.79927  x1,y1 87.25185  121.44526 conf: 0.99996
 landmark:  (34.78728 47.97876) (73.28166 47.96395) (58.63026 75.06228) (36.07978 88.94170) (72.70532 87.87580)
 
@@ -161,7 +161,7 @@ std::string test(void) {
     }
 }
 
-void load(void) {
+void load(std::string model_dir) {
     p_mtcnn = MtcnnFactory::CreateDetector(type);
     p_mtcnn->LoadModule(model_dir);
 }

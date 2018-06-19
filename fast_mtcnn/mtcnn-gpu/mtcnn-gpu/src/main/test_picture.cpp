@@ -101,12 +101,12 @@ int main(int argc, char * argv[])
             }
 
             // draw box
-            cv::rectangle(frame, cv::Point(box.x0, box.y0), cv::Point(box.x1, box.y1), cv::Scalar(0, 255, 0), 2);
+            // cv::rectangle(frame, cv::Point(box.x0, box.y0), cv::Point(box.x1, box.y1), cv::Scalar(0, 255, 0), 2);
 
             // draw landmark  scalar: BGR
-            for (int l = 0; l < 5; l++) {
-                cv::circle(frame, cv::Point(box.landmark.x[l],box.landmark.y[l]), 2, cv::Scalar(0, 0, 255), 2);
-            }
+            // for (int l = 0; l < 5; l++) {
+            //     cv::circle(frame, cv::Point(box.landmark.x[l],box.landmark.y[l]), 2, cv::Scalar(0, 0, 255), 2);
+            //}
         }
 
         std::cout << "total detected: " << face_info.size() << " faces. used "
