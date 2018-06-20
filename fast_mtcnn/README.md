@@ -1,5 +1,5 @@
 
-## MTCNN NCNN
+## MTCNN NCNN [Commit 4e29bc](https://github.com/solderzzc/fast_ai/commit/4e29bc36e6bdcb0c9059a5362e653362fe7f9344)
 Just run `docker build .` to test mtcnn on NCNN.
 
 Docker image: solderzzc/rocketchat:mtcnn_ncnn
@@ -10,6 +10,7 @@ Docker image: solderzzc/rocketchat:mtcnn_ncnn
 ## MTCNN GPU C++
 
 ```
+git checkout 4e29bc36e6bdcb0c9059a5362e653362fe7f9344
 cd fast_mtcnn
 ./run.sh solderzzc/rocketchat:mxnet_mali_no_profile
 apt-get install -y python-opencv python-sklearn python-skimage cmake
