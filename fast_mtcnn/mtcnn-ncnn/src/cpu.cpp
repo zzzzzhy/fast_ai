@@ -36,6 +36,12 @@
 #endif
 #endif
 
+#define __ANDROID__
+#include <cstring>
+#include <sys/syscall.h>
+#include <unistd.h>
+#define gettid() syscall(SYS_gettid)
+
 namespace ncnn {
 
 #ifdef __ANDROID__
@@ -492,3 +498,4 @@ void set_omp_dynamic(int dynamic)
 }
 
 } // namespace ncnn
+#undef __ANDROID__

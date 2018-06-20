@@ -386,9 +386,8 @@ int test_picture(){
 int main(int argc, char** argv)
 {
     const char* imagepath = argv[1];
-    //std::vector<int> cpuids {5};
 
-    //ncnn::set_cpu_powersave(2);
+    //ncnn::set_cpu_powersave(1);
     //fprintf(stderr, " power save state is %d",ncnn::get_cpu_powersave());
 
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
@@ -409,10 +408,16 @@ int main(int argc, char** argv)
     gettimeofday(&tv3,&tz3);
     int total_count = 1000;
     for(int i = 0; i<total_count; i++){
+      int count = 0;
       gettimeofday(&tv1,&tz1);
       mm.detect(ncnn_img, finalBbox);
       gettimeofday(&tv2,&tz2);
-      printf( "%s = %g ms \n ", "Detection All time", getElapse(&tv1, &tv2) );
+      for(vector<Bbox>::iterator it=finalBbox.begin(); it!=finalBbox.end();it++){
+          if((*it).exist){
+              count++;
+          }
+      }
+      printf( "%s = %g ms, detected %d persons\n ", "Detection All time", getElapse(&tv1, &tv2), count );
     }
     gettimeofday(&tv4,&tz4);
     printf( "%s = %g ms \n ", "Detection Everage time", getElapse(&tv3, &tv4)/total_count );
@@ -427,7 +432,7 @@ int main(int argc, char** argv)
     }
 
     std::cout << "totol detect " << total << " persons" << std::endl;
-    //cv::imwrite("result.jpg",cv_img);
+    cv::imwrite("result_ref.jpg",cv_img);
     //imshow("face_detection", cv_img);
     //cv::waitKey(0);
     return 0;
