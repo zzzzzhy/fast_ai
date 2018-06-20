@@ -24,3 +24,6 @@ link_directories(
 add_executable(mtcnn mtcnn.cpp)
 
 target_link_libraries(mtcnn ncnn ${OpenCV_LIBS})
+
+pybind11_add_module(face_detection py_face_detector.cpp)
+target_link_libraries(face_detection PRIVATE ncnn ${OpenCV_LIBS})

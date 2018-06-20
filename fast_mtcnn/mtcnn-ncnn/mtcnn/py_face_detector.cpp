@@ -3,10 +3,11 @@
 #include <math.h>
 #include <iostream>
 #include <sys/time.h>
-//#include <opencv2/core/core.hpp>
-//#include <opencv2/highgui/highgui.hpp>
+#include <string>
+
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <opencv2/opencv.hpp>
-#include "cpu.h"
 #include "mtcnn.h"
 
 bool cmpScore(orderScore lsh, orderScore rsh){
@@ -41,7 +42,7 @@ void mtcnn::generateBbox(ncnn::Mat score, ncnn::Mat location, std::vector<Bbox>&
     int count = 0;
     //score p
     float *p = score.channel(1);//score.data + score.cstep;
-    float *plocal = (float *)location.data;
+    float *plocal = location.data;
     Bbox bbox;
     orderScore order;
     for(int row=0;row<score.h;row++){
@@ -235,13 +236,13 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             ncnn::Mat in;
             resize_bilinear(tempIm, in, 24, 24);
             ncnn::Extractor ex = Rnet.create_extractor();
-            ex.set_light_mode(true);
+            ex.set_light_mode(false);
             ex.set_num_threads(1);
             ex.input("data", in);
             ncnn::Mat score, bbox;
             ex.extract("prob1", score);
             ex.extract("conv5-2", bbox);
-            if(*(float *)(score.data+score.cstep)>threshold[1]){
+            if(*(score.data+score.cstep)>threshold[1]){
                 for(int channel=0;channel<4;channel++)
                     it->regreCoord[channel]=bbox.channel(channel)[0];//*(bbox.data+channel*bbox.cstep);
                 it->area = (it->x2 - it->x1)*(it->y2 - it->y1);
@@ -382,13 +383,9 @@ int test_picture(){
 	cv::waitKey(0);
 
 }
-
-int main(int argc, char** argv)
+int loop_test(std::string imagepath,int total_count)
 {
-    const char* imagepath = argv[1];
-
-    //ncnn::set_cpu_powersave(1);
-    //fprintf(stderr, " power save state is %d",ncnn::get_cpu_powersave());
+    //const char* imagepath = argv[1];
 
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty())
@@ -406,18 +403,34 @@ int main(int argc, char** argv)
     struct timezone tz3,tz4;
 
     gettimeofday(&tv3,&tz3);
-    int total_count = 1000;
+    int count = 0;
     for(int i = 0; i<total_count; i++){
-      int count = 0;
       gettimeofday(&tv1,&tz1);
       mm.detect(ncnn_img, finalBbox);
       gettimeofday(&tv2,&tz2);
+      std::ostringstream result;
+      result << "{\"result\":[";
       for(vector<Bbox>::iterator it=finalBbox.begin(); it!=finalBbox.end();it++){
           if((*it).exist){
               count++;
+
+              if (it != finalBbox.begin()){
+                result << ",";
+              }
+              result <<   "{ \"score\" :" << (*it).score << ",";
+              result <<   "   \"bbox\"  : [" << (*it).x1 << "," << (*it).y1 << "," <<(*it).x2 <<","<<(*it).y2<<"],";
+              result <<   "   \"landmark\":[ ";
+              result <<   "        [" << (int)*(it->ppoint+0) << "," << (int)*(it->ppoint+0+5) << "] ,";
+              result <<   "        [" << (int)*(it->ppoint+1) << "," << (int)*(it->ppoint+1) << "] ,";
+              result <<   "        [" << (int)*(it->ppoint+2) << "," << (int)*(it->ppoint+2) << "] ,";
+              result <<   "        [" << (int)*(it->ppoint+3) << "," << (int)*(it->ppoint+3) << "] ,";
+              result <<   "        [" << (int)*(it->ppoint+4) << "," << (int)*(it->ppoint+4) << "]";
+              result <<   "   ]";
+              result <<   "}"; // score
           }
       }
-      printf( "%s = %g ms, detected %d persons\n ", "Detection All time", getElapse(&tv1, &tv2), count );
+      result << "]}";
+      printf( "%s = %g ms \n ", "Detection All time", getElapse(&tv1, &tv2) );
     }
     gettimeofday(&tv4,&tz4);
     printf( "%s = %g ms \n ", "Detection Everage time", getElapse(&tv3, &tv4)/total_count );
@@ -432,8 +445,82 @@ int main(int argc, char** argv)
     }
 
     std::cout << "totol detect " << total << " persons" << std::endl;
-    cv::imwrite("result_ref.jpg",cv_img);
+    //cv::imwrite("result.jpg",cv_img);
     //imshow("face_detection", cv_img);
     //cv::waitKey(0);
     return 0;
+}
+std::string detect(std::string imagepath)
+{
+    //const char* imagepath = argv[1];
+
+    cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
+    if (cv_img.empty())
+    {
+        fprintf(stderr, "cv::imread %s failed\n", imagepath);
+        return "{\"result\":[]}";
+    }
+    std::vector<Bbox> finalBbox;
+    mtcnn mm;
+    ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(cv_img.data, ncnn::Mat::PIXEL_BGR2RGB, cv_img.cols, cv_img.rows);
+    struct timeval  tv1,tv2;
+    struct timezone tz1,tz2;
+
+    gettimeofday(&tv1,&tz1);
+    mm.detect(ncnn_img, finalBbox);
+    gettimeofday(&tv2,&tz2);
+
+    std::ostringstream result;
+    result << "{\"result\":[";
+    int count = 0;
+    for(vector<Bbox>::iterator it=finalBbox.begin(); it!=finalBbox.end();it++){
+        if((*it).exist){
+            count++;
+
+            if (it != finalBbox.begin()){
+              result << ",";
+            }
+            result <<   "{ \"score\" :" << (*it).score << ",";
+            result <<   "   \"bbox\"  : [" << (*it).x1 << "," << (*it).y1 << "," <<(*it).x2 <<","<<(*it).y2<<"],";
+            result <<   "   \"landmark\":[ ";
+            result <<   "        [" << (int)*(it->ppoint+0) << "," << (int)*(it->ppoint+0+5) << "] ,";
+            result <<   "        [" << (int)*(it->ppoint+1) << "," << (int)*(it->ppoint+1+5) << "] ,";
+            result <<   "        [" << (int)*(it->ppoint+2) << "," << (int)*(it->ppoint+2+5) << "] ,";
+            result <<   "        [" << (int)*(it->ppoint+3) << "," << (int)*(it->ppoint+3+5) << "] ,";
+            result <<   "        [" << (int)*(it->ppoint+4) << "," << (int)*(it->ppoint+4+5) << "]";
+            result <<   "   ]";
+            result <<   "}"; // score
+        }
+    }
+    result << "]}";
+    printf( "%s = %g ms \n ", "Detection time", getElapse(&tv1, &tv2) );
+
+    return result.str();
+}
+PYBIND11_MODULE(face_detection, m) {
+    m.doc() = R"pbdoc(
+        Pybind11 example plugin
+        -----------------------
+
+        .. currentmodule:: face_detection
+
+        .. autosummary::
+           :toctree: _generate
+
+           detect
+    )pbdoc";
+
+    m.def("loop_test", &loop_test, R"pbdoc(
+        loop test function
+    )pbdoc");
+
+    m.def("detect", &detect, R"pbdoc(
+        detect function
+    )pbdoc");
+
+#ifdef VERSION_INFO
+    m.attr("__version__") = VERSION_INFO;
+#else
+    m.attr("__version__") = "dev";
+#endif
 }

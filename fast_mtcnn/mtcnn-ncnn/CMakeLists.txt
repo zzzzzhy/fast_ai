@@ -13,6 +13,7 @@ endif()
 message(STATUS "CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 
 project(ncnn)
+add_subdirectory(pybind11)
 
 cmake_minimum_required(VERSION 2.8.10)
 
