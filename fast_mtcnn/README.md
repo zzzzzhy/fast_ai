@@ -4,9 +4,10 @@ Just run `docker build .` to test mtcnn on NCNN.
 
 Docker image: solderzzc/rocketchat:mtcnn_ncnn
 
-| Runtime Lib | Run On | Computation Cost | Speed |
-| :---------: |:-----: |:---------------: |:----: |
-| NCNN | NEON | 1.5 core | 233ms |
+| Runtime Lib | Run On | Thread Num |Computation Cost | Speed |
+| :---------: |:-----: |:----------:|:---------------:|:-----:|
+| NCNN | NEON | 1.5 core | 8 | 233ms |
+| NCNN | NEON | 1 core   | 1 | 118ms |
 ## MTCNN GPU C++
 
 ```
