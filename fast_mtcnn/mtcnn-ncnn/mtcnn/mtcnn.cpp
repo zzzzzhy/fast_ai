@@ -6,6 +6,7 @@
 //#include <opencv2/core/core.hpp>
 //#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
+#include "cpu.h"
 #include "mtcnn.h"
 
 bool cmpScore(orderScore lsh, orderScore rsh){
@@ -40,7 +41,7 @@ void mtcnn::generateBbox(ncnn::Mat score, ncnn::Mat location, std::vector<Bbox>&
     int count = 0;
     //score p
     float *p = score.channel(1);//score.data + score.cstep;
-    float *plocal = location.data;
+    float *plocal = (float *)location.data;
     Bbox bbox;
     orderScore order;
     for(int row=0;row<score.h;row++){
@@ -197,7 +198,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
         //in.substract_mean_normalize(mean_vals, norm_vals);
         ncnn::Extractor ex = Pnet.create_extractor();
         ex.set_light_mode(true);
-        ex.set_num_threads(8);
+        ex.set_num_threads(1);
         ex.input("data", in);
         ncnn::Mat score_, location_;
         ex.extract("prob1", score_);
@@ -240,7 +241,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             ncnn::Mat score, bbox;
             ex.extract("prob1", score);
             ex.extract("conv5-2", bbox);
-            if(*(score.data+score.cstep)>threshold[1]){
+            if(*(float *)(score.data+score.cstep)>threshold[1]){
                 for(int channel=0;channel<4;channel++)
                     it->regreCoord[channel]=bbox.channel(channel)[0];//*(bbox.data+channel*bbox.cstep);
                 it->area = (it->x2 - it->x1)*(it->y2 - it->y1);
@@ -385,6 +386,10 @@ int test_picture(){
 int main(int argc, char** argv)
 {
     const char* imagepath = argv[1];
+    //std::vector<int> cpuids {5};
+
+    //ncnn::set_cpu_powersave(2);
+    //fprintf(stderr, " power save state is %d",ncnn::get_cpu_powersave());
 
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty())
