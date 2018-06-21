@@ -1,3 +1,10 @@
+## Build Face Detection Python Module
+```
+./build_face_detection_wheel.sh
+```
+
+Built whl will be placed under ./export/
+
 ## Build Wheel
 ```
 apt-get install python-pip python-setuptools
