@@ -11,10 +11,6 @@
 #include "mtcnn.h"
 
 mtcnn mm;
-ncnn::Extractor ex = Rnet.create_extractor();
-ex.set_light_mode(false);
-ex.set_num_threads(1);
-ex.input("data", in);
 
 bool cmpScore(orderScore lsh, orderScore rsh){
     if(lsh.score<rsh.score)
@@ -243,6 +239,10 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             ncnn::Mat in;
             resize_bilinear(tempIm, in, 24, 24);
             ncnn::Mat score, bbox;
+            ncnn::Extractor ex = Rnet.create_extractor();
+            ex.set_light_mode(false);
+            ex.set_num_threads(1);
+            ex.input("data", in);
             ex.extract("prob1", score);
             ex.extract("conv5-2", bbox);
             if(*(score.data+score.cstep)>threshold[1]){
