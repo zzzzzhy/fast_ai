@@ -10,6 +10,12 @@
 #include <opencv2/opencv.hpp>
 #include "mtcnn.h"
 
+mtcnn mm;
+ncnn::Extractor ex = Rnet.create_extractor();
+ex.set_light_mode(false);
+ex.set_num_threads(1);
+ex.input("data", in);
+
 bool cmpScore(orderScore lsh, orderScore rsh){
     if(lsh.score<rsh.score)
         return true;
@@ -28,6 +34,7 @@ static float getElapse(struct timeval *tv1,struct timeval *tv2)
 }
 
 mtcnn::mtcnn(){
+    std::cout << "init model,loading";
     Pnet.load_param("det1.param");
     Pnet.load_model("det1.bin");
     Rnet.load_param("det2.param");
@@ -235,10 +242,6 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             copy_cut_border(img, tempIm, (*it).y1, img_h-(*it).y2, (*it).x1, img_w-(*it).x2);
             ncnn::Mat in;
             resize_bilinear(tempIm, in, 24, 24);
-            ncnn::Extractor ex = Rnet.create_extractor();
-            ex.set_light_mode(false);
-            ex.set_num_threads(1);
-            ex.input("data", in);
             ncnn::Mat score, bbox;
             ex.extract("prob1", score);
             ex.extract("conv5-2", bbox);
@@ -271,8 +274,8 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             ncnn::Mat in;
             resize_bilinear(tempIm, in, 48, 48);
             ncnn::Extractor ex = Onet.create_extractor();
-            ex.set_light_mode(true);
-            ex.set_num_threads(8);
+            ex.set_light_mode(false);
+            ex.set_num_threads(1);
             ex.input("data", in);
             ncnn::Mat score, bbox, keyPoint;
             ex.extract("prob1", score);
@@ -307,7 +310,6 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
 void test_video() {
 	std::string model_path = "../models";
-	mtcnn mm;
 	cv::VideoCapture mVideoCapture(0);
 	if (!mVideoCapture.isOpened()) {
 		return;
@@ -347,42 +349,6 @@ void test_video() {
 	return ;
 }
 
-int test_picture(){
-	std::string model_path = "../models";
-	mtcnn mm;
-
-	std::cout << "after load model..." << std::endl;
-	clock_t start_time = clock();
-
-	cv::Mat image;
-	image = cv::imread("../sample.jpg");
-	ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(image.data, ncnn::Mat::PIXEL_BGR2RGB, image.cols, image.rows);
-	std::vector<Bbox> finalBbox;
-	mm.detect(ncnn_img, finalBbox);
-
-	const int num_box = finalBbox.size();
-	cout << "num_box: " << num_box << endl;
-	std::vector<cv::Rect> bbox;
-	bbox.resize(num_box);
-	for (int i = 0; i < num_box; i++) {
-		bbox[i] = cv::Rect(finalBbox[i].x1, finalBbox[i].y1, finalBbox[i].x2 - finalBbox[i].x1 + 1, finalBbox[i].y2 - finalBbox[i].y1 + 1);
-
-	}
-	for (vector<cv::Rect>::iterator it = bbox.begin(); it != bbox.end(); it++) {
-		rectangle(image, (*it), Scalar(0, 0, 255), 2, 8, 0);
-	}
-
-	std::cout << "bbox size: " << bbox.size() << std::endl;
-
-	exit(0);
-	imshow("face_detection", image);
-	clock_t finish_time = clock();
-	double total_time = (double)(finish_time - start_time) / CLOCKS_PER_SEC;
-	std::cout << "time" << total_time * 1000 << "ms" << std::endl;
-
-	cv::waitKey(0);
-
-}
 int loop_test(std::string imagepath,int total_count)
 {
     //const char* imagepath = argv[1];
@@ -394,7 +360,6 @@ int loop_test(std::string imagepath,int total_count)
         return -1;
     }
     std::vector<Bbox> finalBbox;
-    mtcnn mm;
     ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(cv_img.data, ncnn::Mat::PIXEL_BGR2RGB, cv_img.cols, cv_img.rows);
     struct timeval  tv1,tv2;
     struct timezone tz1,tz2;
@@ -452,19 +417,25 @@ int loop_test(std::string imagepath,int total_count)
 }
 std::string detect(std::string imagepath)
 {
-    //const char* imagepath = argv[1];
+    struct timeval  tv1,tv2;
+    struct timezone tz1,tz2;
 
+    gettimeofday(&tv1,&tz1);
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty())
     {
         fprintf(stderr, "cv::imread %s failed\n", imagepath);
         return "{\"result\":[]}";
     }
+    gettimeofday(&tv2,&tz2);
+    printf( "%s = %g ms \n ", "image read", getElapse(&tv1, &tv2) );
+
+    gettimeofday(&tv1,&tz1);
     std::vector<Bbox> finalBbox;
-    mtcnn mm;
     ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(cv_img.data, ncnn::Mat::PIXEL_BGR2RGB, cv_img.cols, cv_img.rows);
-    struct timeval  tv1,tv2;
-    struct timezone tz1,tz2;
+
+    gettimeofday(&tv2,&tz2);
+    printf( "%s = %g ms \n ", "convert mat", getElapse(&tv1, &tv2) );
 
     gettimeofday(&tv1,&tz1);
     mm.detect(ncnn_img, finalBbox);

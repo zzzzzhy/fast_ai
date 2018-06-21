@@ -9,6 +9,8 @@
 #include "cpu.h"
 #include "mtcnn.h"
 
+mtcnn mm;
+
 bool cmpScore(orderScore lsh, orderScore rsh){
     if(lsh.score<rsh.score)
         return true;
@@ -27,6 +29,7 @@ static float getElapse(struct timeval *tv1,struct timeval *tv2)
 }
 
 mtcnn::mtcnn(){
+    std::cout << "init mtcnn, loading model";
     Pnet.load_param("det1.param");
     Pnet.load_model("det1.bin");
     Rnet.load_param("det2.param");
@@ -306,7 +309,6 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
 void test_video() {
 	std::string model_path = "../models";
-	mtcnn mm;
 	cv::VideoCapture mVideoCapture(0);
 	if (!mVideoCapture.isOpened()) {
 		return;
@@ -348,7 +350,6 @@ void test_video() {
 
 int test_picture(){
 	std::string model_path = "../models";
-	mtcnn mm;
 
 	std::cout << "after load model..." << std::endl;
 	clock_t start_time = clock();
@@ -390,17 +391,24 @@ int main(int argc, char** argv)
     //ncnn::set_cpu_powersave(1);
     //fprintf(stderr, " power save state is %d",ncnn::get_cpu_powersave());
 
+    struct timeval  tv1,tv2;
+    struct timezone tz1,tz2;
+
+    gettimeofday(&tv1,&tz1);
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty())
     {
         fprintf(stderr, "cv::imread %s failed\n", imagepath);
         return -1;
     }
+    gettimeofday(&tv2,&tz2);
+    printf( "%s = %g ms\n ", "cv::imread", getElapse(&tv1, &tv2));
+    gettimeofday(&tv1,&tz1);
     std::vector<Bbox> finalBbox;
-    mtcnn mm;
     ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(cv_img.data, ncnn::Mat::PIXEL_BGR2RGB, cv_img.cols, cv_img.rows);
-    struct timeval  tv1,tv2;
-    struct timezone tz1,tz2;
+    gettimeofday(&tv2,&tz2);
+    printf( "%s = %g ms\n ", "img convert to mat", getElapse(&tv1, &tv2));
+
 
     struct timeval  tv3,tv4;
     struct timezone tz3,tz4;
