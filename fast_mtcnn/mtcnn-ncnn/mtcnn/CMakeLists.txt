@@ -22,6 +22,8 @@ link_directories(
   ${OpenCV_Install}/lib
 )
 add_executable(mtcnn mtcnn.cpp)
+add_executable(mtcnn_server mtcnn-rest-server.cpp)
+target_link_libraries(mtcnn_server ncnn pistache ${OpenCV_LIBS})
 
 target_link_libraries(mtcnn ncnn ${OpenCV_LIBS})
 
