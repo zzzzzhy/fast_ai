@@ -11,8 +11,10 @@ RUN git clone --recursive https://github.com/oktal/pistache.git && \
     make install
 
 ADD ./mtcnn-ncnn /root/mtcnn
-RUN cd mtcnn && \
-    mkdir build && cd build && \
-    cmake ../ && make -j6
-WORKDIR /root/mtcnn/mtcnn
+#RUN cd mtcnn && \
+#    mkdir build && cd build && \
+#    cmake ../ && make -j6
+WORKDIR /root/mtcnn
+RUN pip install wheel && \
+    python setup.py sdist bdist_wheel
 #RUN ../build/mtcnn/mtcnn ./1_854x480.jpg
