@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:18.04
+FROM lambdazhang/raidcdn:tf_1.8
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y git scons cmake wget unzip curl build-essential \
     libprotobuf-dev protobuf-compiler libopencv-dev python-pip python-setuptools python-dev
