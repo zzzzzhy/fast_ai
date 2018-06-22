@@ -30,6 +30,7 @@ print('cost {}'.format(done-start))
 start = time.time()
 for i in range (1,1000):
   step_start = time.time()
+  a = np.random.uniform(size=(1,3,112,112)).astype('float32')
   mod.run(data=a)
   step_end = time.time()
   print('step {} cost {}'.format(i,(step_end - step_start)))
