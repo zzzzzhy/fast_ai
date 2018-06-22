@@ -23,8 +23,8 @@ RUN cd /build/ComputeLibrary/build && cp *.so *.a /usr/lib/
 #    g++ acl_test.cc build/utils/*.o -O2 -std=c++11 -I. -Iinclude -Lbuild -larm_compute -larm_compute_graph -larm_compute_core -lOpenCL -o acl_test
 
 RUN git clone --recursive https://github.com/dmlc/tvm && apt-get install -y python-dev libtinfo-dev zlib1g-dev
-ADD config.cmake /build/tvm/build/config.cmake
+
+ADD config.cmake /tvm/build/config.cmake
 
 WORKDIR /build/tvm/build
-RUN cmake .. && make -j6
-
+RUN cmake -DUSE_LLVM=ON .. && make -j6
