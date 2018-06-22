@@ -1,0 +1,56 @@
+FROM aarch64/debian:stretch
+RUN apt-get update && apt-get install -y scons libopenblas-dev git cmake build-essential \
+    liblapack-dev libblas-dev libopencv-dev opencl-headers python-setuptools python-pip libgfortran3 \
+    python-numpy python-scipy wget \
+    python-opencv
+
+RUN pip install --upgrade pip
+
+RUN wget http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-aarch64-linux-gnu.tar.xz
+RUN tar -xvf clang+llvm-6.0.0-aarch64-linux-gnu.tar.xz --strip 1 && rm clang+llvm-6.0.0-aarch64-linux-gnu.tar.xz
+
+ADD Mali/libmali-midgard-4th-r13p0.so /usr/lib/libmali.so
+RUN ln -s /usr/lib/libmali.so /usr/lib/libOpenCL.so && \
+    ln -s /usr/lib/libmali.so /usr/lib/libGLES_mali.so
+
+WORKDIR /build
+RUN git clone https://github.com/ARM-software/ComputeLibrary.git --branch v18.05
+RUN cd ComputeLibrary && \
+    scons LLVM_CONFIG=llvm-config Werror=0 neon=1 opencl=1 examples=0 os=linux arch=arm64-v8a embed_kernels=1 build=native -j6
+ADD acl_test.cc /build/ComputeLibrary/acl_test.cc
+RUN cd /build/ComputeLibrary/build && cp *.so *.a /usr/lib/
+#RUN cd ComputeLibrary && \
+#    g++ acl_test.cc build/utils/*.o -O2 -std=c++11 -I. -Iinclude -Lbuild -larm_compute -larm_compute_graph -larm_compute_core -lOpenCL -o acl_test
+
+RUN git clone --recursive https://github.com/dmlc/tvm && apt-get install -y python-dev libtinfo-dev zlib1g-dev
+ADD config.cmake /build/tvm/build/config.cmake
+
+WORKDIR /build/tvm/build
+RUN cmake .. && make -j6
+ENV PYTHONPATH "/build/tvm/python:/build/tvm/topi/python:/build/tvm/nnvm/python:${PYTHONPATH}"
+WORKDIR /build/tvm
+
+RUN cd python; python setup.py install --user; cd .. && \
+    cd topi/python; python setup.py install --user; cd ../.. && \
+    cd nnvm/python; python setup.py install --user; cd ../..
+
+ADD assets/tensorflow-1.8.0-cp27-none-linux_aarch64.whl /tensorflow-1.8.0-cp27-none-linux_aarch64.whl
+ADD assets/requirements.txt /root/requirements.txt
+ADD assets/test.py /test.py
+RUN apt-get update && apt-get install -y python-pip python-opencv python-matplotlib \
+    python-scipy python-h5py python-requests python-psutil git cmake wget unzip \
+    python-sklearn python-numpy curl wget python-pil \
+    zlib1g-dev libjpeg-dev libtiff5-dev && \
+    curl -O https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py && \
+    rm get-pip.py && \
+    pip install --ignore-installed /tensorflow-1.8.0-cp27-none-linux_aarch64.whl && \
+    pip install --ignore-installed -r /root/requirements.txt && rm /root/requirements.txt && \
+    python /test.py && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    rm -rf /root/.cache/pip/ && rm /tensorflow-1.8.0-cp27-none-linux_aarch64.whl && rm /test.py
+
+ADD ./test_runtime.py /root/test_runtime.py
+RUN python /root/test_runtime.py
+RUN apt-get update && apt-get install -y cython
+#RUN pip install Cython 

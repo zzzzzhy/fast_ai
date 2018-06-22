@@ -1,0 +1,30 @@
+FROM lambdazhang/raidcdn:tf_1.8
+
+RUN apt-get update && apt-get install -y libopenblas-base git \
+    opencl-headers python-setuptools python-pip libgfortran3 \
+    python-numpy python-scipy wget \
+    python-matplotlib python-h5py python-requests python-psutil \
+    unzip python-sklearn curl python-pil \
+    python-opencv
+
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py && \
+    rm get-pip.py 
+
+RUN wget http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-aarch64-linux-gnu.tar.xz
+RUN tar -xvf clang+llvm-6.0.0-aarch64-linux-gnu.tar.xz --strip 1 && rm clang+llvm-6.0.0-aarch64-linux-gnu.tar.xz
+
+COPY export/install.tgz /root/install.tgz
+WORKDIR /usr
+RUN tar -xvf /root/install.tgz  --strip 1 && ls -alh /usr/include && rm /root/install.tgz
+
+ADD export/wheels /root/wheels
+
+RUN cd /root/wheels && pip install *.whl && rm -rf /root/wheels
+
+ADD Mali/libmali-midgard-4th-r13p0.so /usr/lib/libmali.so
+RUN ln -s /usr/lib/libmali.so /usr/lib/libOpenCL.so && \
+    ln -s /usr/lib/libmali.so /usr/lib/libGLES_mali.so
+
+ADD ./test_runtime.py /root/test_runtime.py
+RUN python /root/test_runtime.py
