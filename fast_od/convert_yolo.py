@@ -105,14 +105,14 @@ coco_name = 'voc.names'
 coco_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + coco_name   +'?raw=true'
 download(coco_url, coco_name)
 
-exit(0)
-######################################################################
-# Load a test image
-# --------------------------------------------------------------------
 print("Loading the test image...")
 img_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + \
             test_image   +'?raw=true'
 download(img_url, test_image)
+exit(0)
+######################################################################
+# Load a test image
+# --------------------------------------------------------------------
 
 data = nnvm.testing.darknet.load_image(test_image, net.w, net.h)
 
