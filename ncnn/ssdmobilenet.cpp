@@ -17,7 +17,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+//#include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <chrono>
 
@@ -73,7 +73,7 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
 
     ncnn::Extractor ex = mobilenet.create_extractor();
     ex.set_light_mode(false);
-    ex.set_num_threads(4);
+    ex.set_num_threads(1);
 
     START_TIMER
     ex.input("data", in);
@@ -110,7 +110,7 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
         Object object = objects.at(i);
         if(object.prob > show_threshold)
         {
-            cv::rectangle(raw_img, object.rec, cv::Scalar(255, 0, 0));
+            //cv::rectangle(raw_img, object.rec, cv::Scalar(255, 0, 0));
             std::ostringstream pro_str;
             pro_str<<object.prob;
             std::string label = std::string(class_names[object.class_id]) + ": " + pro_str.str();
@@ -142,9 +142,11 @@ int main(int argc, char** argv)
         fprintf(stderr, "cv::imread %s failed\n", imagepath);
         return -1;
     }
-    START_TIMER
-    detect_mobilenet(m,0.5);
-    STOP_TIMER("Detection Done")
+    for(int i = 0; i < 100; i ++){
+        START_TIMER
+        detect_mobilenet(m,0.5);
+        STOP_TIMER("Detection Done")
+    }
     //std::cout << "Done\n";
 
     return 0;
