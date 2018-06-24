@@ -47,7 +47,7 @@ if os.path.isfile('./' + darknet_lib) is False:
 darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
 
 cfg = "./" + str(cfg_name)
-weights = "./" + str(weights_name)
+#weights = "./" + str(weights_name)
 net = darknet_lib.load_network(cfg, ffi.NULL, 0)
 
 region_layer = net.layers[net.n - 1]
