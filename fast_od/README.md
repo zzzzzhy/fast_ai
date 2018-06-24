@@ -7,4 +7,4 @@
 
 ## Performance
 
-Yolov2 Tiny 0.3s, image load 8s
+Yolov2 Tiny 0.3s, image load 8s <--- may caused by running with another build process which takes all cpu
