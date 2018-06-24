@@ -22,4 +22,6 @@
 | Python Code | [By Python](https://github.com/solderzzc/fast_ai/blob/020ffef678d266b5ed07ed9bdad5f2864fade1a2/fast_od/deploy_od.py#L104) | 8s|
 | C++ Load    |  | 0.3 |
 | Python Convert | | 0.75s|
+
+
 Yolov2 Tiny 0.3s, image load 8s (Python code)
