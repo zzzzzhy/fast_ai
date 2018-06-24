@@ -6,6 +6,12 @@
 ```
 ./build_model.sh
 ```
+## Darknet Runtime
+
+```
+git clone https://github.com/siju-samuel/darknet
+git checkout 0f63332a66f7c41052200a277dc1b67c89257c66
+```
 
 ## Run on ARM
 
