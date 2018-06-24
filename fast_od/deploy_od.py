@@ -17,7 +17,7 @@ from nnvm.testing.darknet import __darknetffi__
 
 ffi = FFI()
 
-model_name = 'yolov2-tiny-voc'
+model_name = 'od'
 test_image = 'dog.jpg'
 
 ctx = tvm.cl(0)
@@ -28,19 +28,19 @@ ctx = tvm.cl(0)
 # Pretrained model available https://pjreddie.com/darknet/imagenet/
 # Download cfg and weights file first time.
 
-cfg_name = model_name + '.cfg'
-weights_name = model_name + '.weights'
-cfg_url = 'https://github.com/siju-samuel/darknet/blob/master/cfg/' + \
-                    cfg_name + '?raw=true'
-weights_url = 'http://pjreddie.com/media/files/' + weights_name + '?raw=true'
+#cfg_name = model_name + '.cfg'
+#weights_name = model_name + '.weights'
+#cfg_url = 'https://github.com/siju-samuel/darknet/blob/master/cfg/' + \
+#                    cfg_name + '?raw=true'
+#weights_url = 'http://pjreddie.com/media/files/' + weights_name + '?raw=true'
 
-download(cfg_url, cfg_name)
+#download(cfg_url, cfg_name)
 #download(weights_url, weights_name)
 
 ######################################################################
 # Download and Load darknet library
 #if the file doesnt exist, then exit normally.
-darknet_lib = 'libdarknet.so'
+darknet_lib = 'libruntime.so'
 if os.path.isfile('./' + darknet_lib) is False:
     exit(0)
 
@@ -48,14 +48,9 @@ darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
 
 cfg = "./" + str(cfg_name)
 weights = "./" + str(weights_name)
-#net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
-#net = darknet_lib.parse_network_cfg(cfg.encode('utf-8'))
 net = darknet_lib.load_network(cfg, ffi.NULL, 0)
 
 region_layer = net.layers[net.n - 1]
-print(net.layers)
-print(net)
-print(net.n)
 print('region layer classes {}'.format(region_layer.classes))
 
 coco_name = 'od.names'
