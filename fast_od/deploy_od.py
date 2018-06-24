@@ -40,14 +40,14 @@ if os.path.isfile('./' + darknet_lib) is False:
 
 darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
 
-load_image = darknet_lib.load_image_color
+#load_image = darknet_lib.load_image_color
 
 step_start = time.time()
-#data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-image = load_image(test_image, 416, 416)
+data = nnvm.testing.darknet.load_image(test_image, 416, 416)
+#image = load_image(test_image, 416, 416)
 step_done = time.time()
-print(image.data)
-a = np.frombuffer(image.data)
+#print(image.data)
+#a = np.frombuffer(image.data)
 print('load image cost {}'.format((step_done - step_start)))
 
 cfg = "./" + str(cfg_name)
@@ -74,11 +74,11 @@ print("Loading the test image...")
 #data = nnvm.testing.darknet.load_image(test_image, 416, 416)
 
 step_start = time.time()
-#data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-image = load_image(test_image, 416, 416)
+data = nnvm.testing.darknet.load_image(test_image, 416, 416)
+#image = load_image(test_image, 416, 416)
 step_done = time.time()
-print(image.data)
-a = np.frombuffer(image.data)
+#print(image.data)
+#a = np.frombuffer(image.data)
 print('load image cost {}'.format((step_done - step_start)))
 
 ######################################################################
@@ -101,8 +101,8 @@ done = time.time()
 print('first run {}'.format((done - start)/1))
 
 step_start = time.time()
-#data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-data = load_image(test_image, 416, 416)
+data = nnvm.testing.darknet.load_image(test_image, 416, 416)
+#data = load_image(test_image, 416, 416)
 step_done = time.time()
 print('load image cost {}'.format((step_done - step_start)))
 
