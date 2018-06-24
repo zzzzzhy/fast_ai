@@ -28,7 +28,7 @@ ctx = tvm.cl(0)
 # Pretrained model available https://pjreddie.com/darknet/imagenet/
 # Download cfg and weights file first time.
 
-#cfg_name = model_name + '.cfg'
+cfg_name = model_name + '.cfg'
 #weights_name = model_name + '.weights'
 #cfg_url = 'https://github.com/siju-samuel/darknet/blob/master/cfg/' + \
 #                    cfg_name + '?raw=true'
