@@ -7,6 +7,8 @@ docker run --rm --privileged \
      -v `pwd`/runtime_gpu.sh:/root/runtime_gpu.sh \
      -v `pwd`/deploy_od.py:/root/deploy_od.py \
      -v `pwd`/export/od.tar:/root/od.tar \
+     -v `pwd`/export/od.cfg:/root/od.cfg \
+     -v `pwd`/export/libruntime.so:/root/libruntime.so \
      -v `pwd`/export/od.params:/root/od.params \
      -v `pwd`/export/od:/root/od \
      -v `pwd`/export/od.names:/root/od.names \
