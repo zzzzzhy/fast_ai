@@ -48,7 +48,11 @@ net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
 
 def get_data(net, img_path, LIB):
     start = time.time()
-    img = LIB.letterbox_image(LIB.load_image_color(img_path.encode('utf-8'), 0, 0), net.w, net.h)
+    orig_image = LIB.load_image_color(img_path.encode('utf-8'), 0, 0)
+    img_w = orig_image.w
+    img_h = orig_image.h
+    img = LIB.letterbox_image(orig_image, net.w, net.h)
+    LIB.free_image(orig_image)
     done = time.time()
     print('1: Image Load run {}'.format((done - start)))
 
@@ -61,9 +65,10 @@ def get_data(net, img_path, LIB):
             for k in range(img.w):
                 data[c][h][k] = img.data[i]
                 i = i + 1
+    LIB.free_image(img)
     done = time.time()
     print('3: Data Convert run {}'.format((done - start)))
-    return img, data
+    return img_w,img_h, data
 
 dtype = 'float32'
 batch_size = 1
@@ -83,7 +88,7 @@ params = bytearray(open("/root/od.params", "rb").read())
 m = graph_runtime.create(graph, lib, ctx)
 
 step_start = time.time()
-img, data = get_data(net,test_image,darknet_lib)
+im_w, im_h, data = get_data(net,test_image,darknet_lib)
 step_done = time.time()
 print('Lib load image cost {}'.format((step_done - step_start)))
 
@@ -102,7 +107,7 @@ print("Running the test image...")
 start = time.time()
 for i in range(100):
   step_start = time.time()
-  img, data = get_data(net,test_image,darknet_lib)
+  _, _, data = get_data(net,test_image,darknet_lib)
   step_done = time.time()
   print('Lib load image cost {}'.format((step_done - step_start)))
 
@@ -120,8 +125,6 @@ tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
 #do the detection and bring up the bounding boxes
 thresh = 0.24
 hier_thresh = 0.5
-im_h = img.h
-im_w = img.w
 probs= []
 boxes = []
 region_layer = net.layers[net.n - 1]
