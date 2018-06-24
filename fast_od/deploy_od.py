@@ -5,6 +5,8 @@ import tvm
 import os
 import time
 
+from cffi import FFI
+
 from ctypes import *
 
 from tvm.contrib import rpc, util, graph_runtime
@@ -12,6 +14,8 @@ from tvm.contrib import rpc, util, graph_runtime
 from tvm.contrib.download import download
 import nnvm.testing.darknet
 from nnvm.testing.darknet import __darknetffi__
+
+ffi = FFI()
 
 model_name = 'yolov2-tiny-voc'
 test_image = 'dog.jpg'
@@ -31,7 +35,7 @@ cfg_url = 'https://github.com/siju-samuel/darknet/blob/master/cfg/' + \
 weights_url = 'http://pjreddie.com/media/files/' + weights_name + '?raw=true'
 
 download(cfg_url, cfg_name)
-download(weights_url, weights_name)
+#download(weights_url, weights_name)
 
 ######################################################################
 # Download and Load darknet library
@@ -44,7 +48,24 @@ darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
 
 cfg = "./" + str(cfg_name)
 weights = "./" + str(weights_name)
-net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
+#net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
+#net = darknet_lib.parse_network_cfg(cfg.encode('utf-8'))
+net = darknet_lib.load_network(cfg, ffi.NULL, 0)
+
+region_layer = net.layers[net.n - 1]
+print(net.layers)
+print(net)
+print(net.n)
+print('region layer classes {}'.format(region_layer.classes))
+
+coco_name = 'od.names'
+
+with open(coco_name) as f:
+    content = f.readlines()
+
+names = [x.strip() for x in content]
+
+print('names {}'.format(names))
 
 def get_data(net, img_path, LIB):
     start = time.time()
@@ -105,7 +126,7 @@ print('first run {}'.format((done - start)/1))
 
 print("Running the test image...")
 start = time.time()
-for i in range(100):
+for i in range(1):
   step_start = time.time()
   _, _, data = get_data(net,test_image,darknet_lib)
   step_done = time.time()
@@ -117,29 +138,26 @@ for i in range(100):
   step_done = time.time()
   print('step {} cost {}'.format(i,(step_done - step_start)))
 done = time.time()
-print('everage cost {}'.format((done - start)/100))
+print('everage cost {}'.format((done - start)/1))
 # get outputs
 out_shape = (net.outputs,)
 tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
+
+print(tvm_out)
 
 #do the detection and bring up the bounding boxes
 thresh = 0.24
 hier_thresh = 0.5
 probs= []
 boxes = []
-region_layer = net.layers[net.n - 1]
 boxes, probs = nnvm.testing.yolo2_detection.get_region_boxes(region_layer, im_w, im_h, net.w, net.h,
                        thresh, probs, boxes, 1, tvm_out)
 
 boxes, probs = nnvm.testing.yolo2_detection.do_nms_sort(boxes, probs,
                        region_layer.w*region_layer.h*region_layer.n, region_layer.classes, 0.3)
 
-coco_name = 'od.names'
-
-with open(coco_name) as f:
-    content = f.readlines()
-
-names = [x.strip() for x in content]
+print(boxes)
+print(probs)
 
 def draw_detections(num, thresh, boxes, probs, names, classes):
     "Draw the markings around the detected region"
