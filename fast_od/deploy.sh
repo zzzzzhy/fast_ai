@@ -3,6 +3,7 @@
 docker run --rm --privileged \
      -v /sys/class/misc/mali0:/sys/class/misc/mali0 \
      -v/dev/mali0:/dev/mali0 \
+     -v `pwd`/export:/export \
      -v `pwd`/runtime_gpu.sh:/root/runtime_gpu.sh \
      -v `pwd`/deploy_od.py:/root/deploy_od.py \
      -v `pwd`/export/od.tar:/root/od.tar \

@@ -1,5 +1,4 @@
 import nnvm
-import nnvm.testing.darknet
 #import matplotlib.pyplot as plt
 import numpy as np
 import tvm
@@ -8,7 +7,10 @@ import time
 
 from ctypes import *
 
+from tvm.contrib import rpc, util, graph_runtime
+
 from tvm.contrib.download import download
+import nnvm.testing.darknet
 from nnvm.testing.darknet import __darknetffi__
 
 model_name = 'yolov2-tiny-voc'
@@ -36,28 +38,35 @@ download(weights_url, weights_name)
 #if the file doesnt exist, then exit normally.
 darknet_lib = 'libdarknet.so'
 if os.path.isfile('./' + darknet_lib) is False:
-        exit(0)
+    exit(0)
 
 darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
-
-#load_image = darknet_lib.load_image_color
-
-step_start = time.time()
-data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-#image = load_image(test_image, 416, 416)
-step_done = time.time()
-#print(image.data)
-#a = np.frombuffer(image.data)
-print('load image cost {}'.format((step_done - step_start)))
 
 cfg = "./" + str(cfg_name)
 weights = "./" + str(weights_name)
 net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
 
+def get_data(net, img_path, LIB):
+    start = time.time()
+    img = LIB.letterbox_image(LIB.load_image_color(img_path.encode('utf-8'), 0, 0), net.w, net.h)
+    done = time.time()
+    print('1: Image Load run {}'.format((done - start)))
+
+    dtype = 'float32'
+    data = np.empty([img.c, img.h, img.w], dtype)
+    i = 0
+    start = time.time()
+    for c in range(img.c):
+        for h in range(img.h):
+            for k in range(img.w):
+                data[c][h][k] = img.data[i]
+                i = i + 1
+    done = time.time()
+    print('3: Data Convert run {}'.format((done - start)))
+    return img, data
+
 dtype = 'float32'
 batch_size = 1
-
-from tvm.contrib import rpc, util, graph_runtime
 
 # tvm module for compiled functions.
 lib = tvm.module.load('/root/od.tar')
@@ -67,31 +76,20 @@ graph = open("/root/od").read()
 params = bytearray(open("/root/od.params", "rb").read())
 
 ######################################################################
-# Load a test image
-# --------------------------------------------------------------------
-print("Loading the test image...")
-
-#data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-
-step_start = time.time()
-data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-#image = load_image(test_image, 416, 416)
-step_done = time.time()
-#print(image.data)
-#a = np.frombuffer(image.data)
-print('load image cost {}'.format((step_done - step_start)))
-
-######################################################################
 # Execute on TVM Runtime
 # ----------------------
 # The process is no different from other examples.
-from tvm.contrib import graph_runtime
 
 m = graph_runtime.create(graph, lib, ctx)
 
+step_start = time.time()
+img, data = get_data(net,test_image,darknet_lib)
+step_done = time.time()
+print('Lib load image cost {}'.format((step_done - step_start)))
+
 m.load_params(params)
 # set inputs
-m.set_input('data', tvm.nd.array(image.data))
+m.set_input('data', tvm.nd.array(data.astype(dtype)))
 #m.set_input(**params)
 # execute
 print("Running the test image...")
@@ -100,15 +98,14 @@ m.run()
 done = time.time()
 print('first run {}'.format((done - start)/1))
 
-step_start = time.time()
-data = nnvm.testing.darknet.load_image(test_image, 416, 416)
-#data = load_image(test_image, 416, 416)
-step_done = time.time()
-print('load image cost {}'.format((step_done - step_start)))
-
 print("Running the test image...")
 start = time.time()
 for i in range(100):
+  step_start = time.time()
+  img, data = get_data(net,test_image,darknet_lib)
+  step_done = time.time()
+  print('Lib load image cost {}'.format((step_done - step_start)))
+
   step_start = time.time()
   m.set_input('data', tvm.nd.array(data.astype(dtype)))
   m.run()
@@ -123,12 +120,12 @@ tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
 #do the detection and bring up the bounding boxes
 thresh = 0.24
 hier_thresh = 0.5
-img = nnvm.testing.darknet.load_image_color(test_image)
-_, im_h, im_w = img.shape
+im_h = img.h
+im_w = img.w
 probs= []
 boxes = []
 region_layer = net.layers[net.n - 1]
-boxes, probs = nnvm.testing.yolo2_detection.get_region_boxes(region_layer, im_w, im_h, 416, 416,
+boxes, probs = nnvm.testing.yolo2_detection.get_region_boxes(region_layer, im_w, im_h, net.w, net.h,
                        thresh, probs, boxes, 1, tvm_out)
 
 boxes, probs = nnvm.testing.yolo2_detection.do_nms_sort(boxes, probs,
@@ -141,7 +138,7 @@ with open(coco_name) as f:
 
 names = [x.strip() for x in content]
 
-def draw_detections(im, num, thresh, boxes, probs, names, classes):
+def draw_detections(num, thresh, boxes, probs, names, classes):
     "Draw the markings around the detected region"
     for i in range(num):
         labelstr = []
@@ -152,6 +149,6 @@ def draw_detections(im, num, thresh, boxes, probs, names, classes):
                     category = j
                 labelstr.append(names[j])
                 print("{}:{}".format(names[j],probs[i][j]))
-draw_detections(img, region_layer.w*region_layer.h*region_layer.n,
+draw_detections(region_layer.w*region_layer.h*region_layer.n,
     thresh, boxes, probs, names, region_layer.classes)
             #_draw_label(im, top + width, left, label, rgb)
