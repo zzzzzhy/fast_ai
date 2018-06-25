@@ -31,7 +31,7 @@ from nnvm.testing.darknet import __darknetffi__
 # Set the parameters here.
 # Supported models alexnet, resnet50, resnet152, extraction, yolo
 #
-model_name = 'yolov2-tiny-voc'
+model_name = 'yolov3-tiny'
 test_image = 'dog.jpg'
 target = 'llvm'
 target_host = 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon'
@@ -56,10 +56,7 @@ download(weights_url, weights_name)
 # Download and Load darknet library
 # ---------------------------------
 
-darknet_lib = 'libdarknet.so'
-darknetlib_url = 'https://github.com/pjreddie/darknet/blob/master/lib/' + \
-                        darknet_lib + '?raw=true'
-download(darknetlib_url, darknet_lib)
+darknet_lib = 'libdarknetv3.so'
 
 #if the file doesnt exist, then exit normally.
 if os.path.isfile('./' + darknet_lib) is False:
@@ -110,7 +107,7 @@ def save_lib():
 + "deploy_param.params", "wb") as fo:
         fo.write(nnvm.compiler.save_param_dict(params))
 save_lib()
-coco_name = 'voc.names'
+coco_name = 'coco.names'
 coco_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + coco_name   +'?raw=true'
 download(coco_url, coco_name)
 
@@ -160,9 +157,9 @@ boxes, probs = nnvm.testing.yolo2_detection.do_nms_sort(boxes, probs,
 
 #coco_name = 'coco.names'
 coco_name = 'voc.names'
-coco_url = 'https://github.com/pjreddie/darknet/blob/master/data/' + coco_name   +'?raw=true'
+coco_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + coco_name   +'?raw=true'
 font_name = 'arial.ttf'
-font_url = 'https://github.com/pjreddie/darknet/blob/master/data/' + font_name   +'?raw=true'
+font_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + font_name   +'?raw=true'
 download(coco_url, coco_name)
 download(font_url, font_name)
 
