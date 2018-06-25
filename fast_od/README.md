@@ -10,7 +10,10 @@
 
 ```
 git clone https://github.com/siju-samuel/darknet
+cd darknet
 git checkout 0f63332a66f7c41052200a277dc1b67c89257c66
+make -j4
+cp libdarknet.so ../export/
 ```
 
 ## Run on ARM
