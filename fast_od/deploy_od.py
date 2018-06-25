@@ -14,10 +14,13 @@ from tvm.contrib import rpc, util, graph_runtime
 from tvm.contrib.download import download
 import nnvm.testing.darknet
 from nnvm.testing.darknet import __darknetffi__
+import numpy_converter
+
+import convert
 
 ffi = FFI()
 
-model_name = 'yolov2-tiny-voc'
+model_name = 'od'
 test_image = 'dog.jpg'
 
 ctx = tvm.cl(0)
@@ -29,33 +32,28 @@ ctx = tvm.cl(0)
 # Download cfg and weights file first time.
 
 cfg_name = model_name + '.cfg'
-weights_name = model_name + '.weights'
-cfg_url = 'https://github.com/siju-samuel/darknet/blob/master/cfg/' + \
-                    cfg_name + '?raw=true'
-weights_url = 'http://pjreddie.com/media/files/' + weights_name + '?raw=true'
+#weights_name = model_name + '.weights'
+#cfg_url = 'https://github.com/siju-samuel/darknet/blob/master/cfg/' + \
+#                    cfg_name + '?raw=true'
+#weights_url = 'http://pjreddie.com/media/files/' + weights_name + '?raw=true'
 
-download(cfg_url, cfg_name)
+#download(cfg_url, cfg_name)
 #download(weights_url, weights_name)
 
 ######################################################################
 # Download and Load darknet library
 #if the file doesnt exist, then exit normally.
-darknet_lib = 'libdarknet.so'
+darknet_lib = 'libruntime.so'
 if os.path.isfile('./' + darknet_lib) is False:
     exit(0)
 
 darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
 
 cfg = "./" + str(cfg_name)
-weights = "./" + str(weights_name)
-#net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
-#net = darknet_lib.parse_network_cfg(cfg.encode('utf-8'))
+#weights = "./" + str(weights_name)
 net = darknet_lib.load_network(cfg, ffi.NULL, 0)
 
 region_layer = net.layers[net.n - 1]
-print(net.layers)
-print(net)
-print(net.n)
 print('region layer classes {}'.format(region_layer.classes))
 
 coco_name = 'od.names'
@@ -79,17 +77,24 @@ def get_data(net, img_path, LIB):
 
     dtype = 'float32'
     data = np.empty([img.c, img.h, img.w], dtype)
+    start = time.time()
+    data1 = np.empty([img.c, img.h, img.w], dtype)
+    convert.float32_convert(data1,img.data)
+    done = time.time()
+    print('2: data convert in C {}'.format((done - start)))
     i = 0
+    print(img.data)
     start = time.time()
     for c in range(img.c):
         for h in range(img.h):
             for k in range(img.w):
                 data[c][h][k] = img.data[i]
                 i = i + 1
+    print('Convert Result same: {}'.format(np.array_equal(data,data1)))
     LIB.free_image(img)
     done = time.time()
     print('3: Data Convert run {}'.format((done - start)))
-    return img_w,img_h, data
+    return img_w,img_h, data1
 
 dtype = 'float32'
 batch_size = 1
