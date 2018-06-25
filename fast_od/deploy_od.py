@@ -14,7 +14,9 @@ from tvm.contrib import rpc, util, graph_runtime
 from tvm.contrib.download import download
 import nnvm.testing.darknet
 from nnvm.testing.darknet import __darknetffi__
-from numpy_converter import f
+import numpy_converter
+
+import convert
 
 ffi = FFI()
 
@@ -75,20 +77,24 @@ def get_data(net, img_path, LIB):
 
     dtype = 'float32'
     data = np.empty([img.c, img.h, img.w], dtype)
+    start = time.time()
+    data1 = np.empty([img.c, img.h, img.w], dtype)
+    convert.float32_convert(data1,img.data)
+    done = time.time()
+    print('2: data convert in C {}'.format((done - start)))
     i = 0
-    print(image.data)
-    ret = f(image.data)
-    print(ret)
+    print(img.data)
     start = time.time()
     for c in range(img.c):
         for h in range(img.h):
             for k in range(img.w):
                 data[c][h][k] = img.data[i]
                 i = i + 1
+    print('Convert Result same: {}'.format(np.array_equal(data,data1)))
     LIB.free_image(img)
     done = time.time()
     print('3: Data Convert run {}'.format((done - start)))
-    return img_w,img_h, data
+    return img_w,img_h, data1
 
 dtype = 'float32'
 batch_size = 1
