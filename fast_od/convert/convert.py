@@ -37,3 +37,10 @@ def float32_convert(output, img_data):
     _output = _convert.ffi.cast('float *', output.ctypes.data)
     _convert.lib.float32_convert(_x, _y, _z, _output, img_data)
 
+def calc_result(w,h,output):
+    _shape = _convert.ffi.cast('size_t', output.shape[0])
+    _w = _convert.ffi.cast('int', w)
+    _h = _convert.ffi.cast('int', h)
+    _output = _convert.ffi.cast('float *', output.ctypes.data)
+    _convert.lib.calc_result(_w,_h,_shape,_output)
+_convert.lib.init_darknet()

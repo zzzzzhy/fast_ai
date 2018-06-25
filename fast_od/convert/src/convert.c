@@ -1,7 +1,27 @@
 
 #include "stdlib.h" // import size_t
+#include "darknet.h" // import darknet
 
+void print_detector_detections(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
+{
+    int i, j;
+    for(i = 0; i < total; ++i){
+        float xmin = boxes[i].x - boxes[i].w/2. + 1;
+        float xmax = boxes[i].x + boxes[i].w/2. + 1;
+        float ymin = boxes[i].y - boxes[i].h/2. + 1;
+        float ymax = boxes[i].y + boxes[i].h/2. + 1;
 
+        if (xmin < 1) xmin = 1;
+        if (ymin < 1) ymin = 1;
+        if (xmax > w) xmax = w;
+        if (ymax > h) ymax = h;
+
+        for(j = 0; j < classes; ++j){
+            if (probs[i][j]) printf("%s %f %f %f %f %f\n", id, probs[i][j],
+                    xmin, ymin, xmax, ymax);
+        }
+    }
+}
 
 void sample3d(size_t row_count, size_t column_count, size_t window_size, float *input, float *output) {
     printf("row count-> %zu \n", row_count);
@@ -52,4 +72,45 @@ void float32_convert(size_t _c, size_t _h, size_t _w, float *output, float *data
             }
         }
     }
+}
+
+network *net;
+layer l;
+int classes;
+float iou_thresh = .5;
+float thresh = .24;
+char* id;
+
+const char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
+
+void init_darknet(void){
+    net = load_network("/root/od.cfg", NULL, 0);
+    id = basecfg("/root/od.cfg");
+    l = net->layers[net->n-1];
+    classes = l.classes;
+}
+
+void calc_result(int orig_w, int orig_h, size_t shape, float *output){
+    int nboxes = 0;
+    int j;
+    int *map = 0;
+    box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
+    float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
+    for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(l.classes + 1, sizeof(float *));
+    float **masks = 0;
+    if (l.coords > 4){
+        masks = calloc(l.w*l.h*l.n, sizeof(float*));
+        for(j = 0; j < l.w*l.h*l.n; ++j) masks[j] = calloc(l.coords-4, sizeof(float *));
+    }
+
+    for(int i = 0; i < shape; i++) {
+        l.output[i] = output[i];
+    }
+    get_region_boxes(l, orig_w, orig_h, net->w, net->h, thresh, probs, boxes, 0, 0, map, .5, 1);
+    
+    do_nms_sort(boxes, probs, l.w*l.h*l.n, l.classes, 0.3);
+    print_detector_detections(id, boxes, probs, l.w*l.h*l.n, classes, orig_w, orig_h);
+
+    free(boxes);
+    free_ptrs((void **)probs, l.w*l.h*l.n);
 }
