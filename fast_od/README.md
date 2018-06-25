@@ -10,7 +10,10 @@
 
 ```
 git clone https://github.com/siju-samuel/darknet
+cd darknet
 git checkout 0f63332a66f7c41052200a277dc1b67c89257c66
+make -j4
+cp libdarknet.so ../export/
 ```
 
 ## Run on ARM
@@ -21,6 +24,12 @@ git checkout 0f63332a66f7c41052200a277dc1b67c89257c66
 
 ## Performance
 
+### Object Detection
+
+| Model   | Runtime         | FLOPS |Memory Usage | CPU Usage        | Time Per Frame |
+|:-------:|:---------------:|:-----:|:-----------:|:----------------:|:--------------:|
+| Yolov2 Tiny voc | TVM GPU | 5.4G  |485 MB       | 14% (on one core)| 0.368s         |
+
 ### Image Load, Preprocessing
 
 | Load Method | Code In Commit | Duration |
@@ -28,6 +37,7 @@ git checkout 0f63332a66f7c41052200a277dc1b67c89257c66
 | Python Code | [By Python](https://github.com/solderzzc/fast_ai/blob/020ffef678d266b5ed07ed9bdad5f2864fade1a2/fast_od/deploy_od.py#L104) | 8s|
 | C++ Load    | [C++ Load](https://github.com/solderzzc/fast_ai/blob/8096c9ca2b4a8efc0eb93f11955c9f81684c8e29/fast_od/deploy_od.py#L51) | 0.3 |
 | Python Convert | [Python Convert](https://github.com/solderzzc/fast_ai/blob/8096c9ca2b4a8efc0eb93f11955c9f81684c8e29/fast_od/deploy_od.py#L59) | 0.75s|
+| C Extension Convert | [C Convert](https://github.com/solderzzc/fast_ai/blob/530da74a0e155dfded844aaaf3c2415741b3748c/fast_od/deploy_od.py#L84) | 0.005s|
 
 
 Yolov2 Tiny 0.3s, image load 8s (Python code)
