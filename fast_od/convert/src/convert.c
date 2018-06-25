@@ -2,6 +2,8 @@
 #include "stdlib.h" // import size_t
 #include "darknet.h" // import darknet
 
+const char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
+
 void print_detector_detections(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
 {
     int i, j;
@@ -17,7 +19,7 @@ void print_detector_detections(char *id, box *boxes, float **probs, int total, i
         if (ymax > h) ymax = h;
 
         for(j = 0; j < classes; ++j){
-            if (probs[i][j]) printf("%s %f %f %f %f %f\n", id, probs[i][j],
+            if (probs[i][j]) printf("%s %f %f %f %f %f\n", voc_names[j], probs[i][j],
                     xmin, ymin, xmax, ymax);
         }
     }
@@ -81,7 +83,6 @@ float iou_thresh = .5;
 float thresh = .24;
 char* id;
 
-const char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 
 void init_darknet(void){
     net = load_network("/root/od.cfg", NULL, 0);
@@ -90,7 +91,7 @@ void init_darknet(void){
     classes = l.classes;
 }
 
-void calc_result(int orig_w, int orig_h, size_t shape, float *output){
+char * calc_result(int orig_w, int orig_h, size_t shape, float *output){
     int nboxes = 0;
     int j;
     int *map = 0;
@@ -113,4 +114,5 @@ void calc_result(int orig_w, int orig_h, size_t shape, float *output){
 
     free(boxes);
     free_ptrs((void **)probs, l.w*l.h*l.n);
+    return "OK";
 }
