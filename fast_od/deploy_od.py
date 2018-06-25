@@ -14,6 +14,7 @@ from tvm.contrib import rpc, util, graph_runtime
 from tvm.contrib.download import download
 import nnvm.testing.darknet
 from nnvm.testing.darknet import __darknetffi__
+from numpy_converter import f
 
 ffi = FFI()
 
@@ -75,6 +76,9 @@ def get_data(net, img_path, LIB):
     dtype = 'float32'
     data = np.empty([img.c, img.h, img.w], dtype)
     i = 0
+    print(image.data)
+    ret = f(image.data)
+    print(ret)
     start = time.time()
     for c in range(img.c):
         for h in range(img.h):
