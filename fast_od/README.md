@@ -24,6 +24,12 @@ cp libdarknet.so ../export/
 
 ## Performance
 
+### Object Detection
+
+| Model   | Runtime         | FLOPS |Memory Usage | CPU Usage        | Time Per Frame |
+|:-------:|:---------------:|:-----:|:-----------:|:----------------:|:--------------:|
+| Yolov2 Tiny voc | TVM GPU | 5.4G  |485 MB       | 14% (on one core)| 0.368s         |
+
 ### Image Load, Preprocessing
 
 | Load Method | Code In Commit | Duration |
