@@ -8,7 +8,7 @@ RUN wget http://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu
 RUN tar -xvf clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz --strip 1 && rm clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz
 
 WORKDIR /build
-RUN echo Commit 51836ba7456ea8cffd54d44104392ad19b7d97e6
+RUN echo Commit 1e66d3c72c7dc24c7255a946e41212e5f516b42e
 RUN git clone --recursive https://github.com/dmlc/tvm && cd tvm && \
     git submodule init && git submodule update
 RUN cd tvm && mkdir build && cd build && cmake -DUSE_LLVM=ON ../ && \
@@ -26,15 +26,31 @@ RUN pip install Pillow
 #ADD from_mxnet.py /root/from_mxnet.py
 #RUN TVM_NDK_CC=aarch64-linux-gnu-gcc python /root/from_mxnet.py && mkdir /export && cp -rf ./deploy.* /export/ && ls -alh /export/
 
-RUN apt-get install -y python-opencv
+RUN apt-get update && apt-get install -y python-opencv
 RUN pip install cffi
+
+WORKDIR /root
+
+RUN echo darknet commit: 270f87d55ce636671084cac6965b3ccc6e6ec032 && \
+    git clone https://github.com/siju-samuel/darknet && \
+    cd darknet && \
+    make -j4 && \
+    cp lib/libdarknet.so ../
+
 ADD from_darknet.py /root/from_darknet.py
 RUN python /root/from_darknet.py
 
-WORKDIR /root
 ADD convert_yolo.py /root/convert_yolo.py
 RUN python convert_yolo.py && ls -alh
 
+#RUN echo darknet commit: f6d861736038da22c9eb0739dca84003c5a5e275 && \
+#    git clone https://github.com/pjreddie/darknet darknetv3 && \
+#    cd darknetv3 && \
+#    make -j4 && \
+#    cp libdarknet.so ../libdarknetv3.so
+
+#ADD convert_yolo3.py /root/convert_yolo3.py
+#RUN python /root/convert_yolo3.py
 
 #ADD ./benchmark /root/benchmark
 #RUN cd /root/benchmark && TVM_NDK_CC=aarch64-linux-gnu-gcc python mali_imagenet_bench_remote.py --target-host 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon' --host 192.168.0.10 --port 9090 --model all

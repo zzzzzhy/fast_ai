@@ -31,10 +31,9 @@ from nnvm.testing.darknet import __darknetffi__
 # Set the parameters here.
 # Supported models alexnet, resnet50, resnet152, extraction, yolo
 #
-model_name = 'yolov2-tiny-voc'
+model_name = 'yolov3-tiny'
 test_image = 'dog.jpg'
 target = 'llvm'
-target_host = 'llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon'
 ctx = tvm.cpu(0)
 
 ######################################################################
@@ -57,9 +56,9 @@ download(weights_url, weights_name)
 # ---------------------------------
 
 darknet_lib = 'libdarknet.so'
-darknetlib_url = 'https://github.com/pjreddie/darknet/blob/master/lib/' + \
-                        darknet_lib + '?raw=true'
-download(darknetlib_url, darknet_lib)
+#darknetlib_url = 'https://github.com/siju-samuel/darknet/blob/master/lib/' + \
+#                        darknet_lib + '?raw=true'
+#download(darknetlib_url, darknet_lib)
 
 #if the file doesnt exist, then exit normally.
 if os.path.isfile('./' + darknet_lib) is False:
@@ -69,18 +68,10 @@ darknet_lib = __darknetffi__.dlopen('./' + darknet_lib)
 cfg = "./" + str(cfg_name)
 weights = "./" + str(weights_name)
 net = darknet_lib.load_network(cfg.encode('utf-8'), weights.encode('utf-8'), 0)
-
-
-region_layer = net.layers[net.n - 1]
-
-print(net.layers)
-print(net.n)
-
-print('region layer classes number is {}'.format(region_layer.classes))
-
 dtype = 'float32'
 batch_size = 1
 print("Converting darknet to nnvm symbols...")
+exit(0)
 sym, params = nnvm.frontend.darknet.from_darknet(net, dtype)
 
 ######################################################################
@@ -91,8 +82,7 @@ data = np.empty([batch_size, net.c ,net.h, net.w], dtype);
 shape = {'data': data.shape}
 print("Compiling the model...")
 with nnvm.compiler.build_config(opt_level=2):
-    graph, lib, params = nnvm.compiler.build(sym, tvm.target.mali(),
-                         shape, dtype, params,target_host=target_host)
+    graph, lib, params = nnvm.compiler.build(sym, target, shape, dtype, params)
 
 #####################################################################
 # Save the JSON
@@ -110,18 +100,14 @@ def save_lib():
 + "deploy_param.params", "wb") as fo:
         fo.write(nnvm.compiler.save_param_dict(params))
 save_lib()
-coco_name = 'voc.names'
-coco_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + coco_name   +'?raw=true'
-download(coco_url, coco_name)
 
+######################################################################
+# Load a test image
+# --------------------------------------------------------------------
 print("Loading the test image...")
 img_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + \
             test_image   +'?raw=true'
 download(img_url, test_image)
-exit(0)
-######################################################################
-# Load a test image
-# --------------------------------------------------------------------
 
 data = nnvm.testing.darknet.load_image(test_image, net.w, net.h)
 
@@ -158,11 +144,10 @@ boxes, probs = nnvm.testing.yolo2_detection.get_region_boxes(region_layer, im_w,
 boxes, probs = nnvm.testing.yolo2_detection.do_nms_sort(boxes, probs,
                        region_layer.w*region_layer.h*region_layer.n, region_layer.classes, 0.3)
 
-#coco_name = 'coco.names'
-coco_name = 'voc.names'
-coco_url = 'https://github.com/pjreddie/darknet/blob/master/data/' + coco_name   +'?raw=true'
+coco_name = 'coco.names'
+coco_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + coco_name   +'?raw=true'
 font_name = 'arial.ttf'
-font_url = 'https://github.com/pjreddie/darknet/blob/master/data/' + font_name   +'?raw=true'
+font_url = 'https://github.com/siju-samuel/darknet/blob/master/data/' + font_name   +'?raw=true'
 download(coco_url, coco_name)
 download(font_url, font_name)
 
