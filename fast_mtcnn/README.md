@@ -17,16 +17,18 @@ python setup.py sdist bdist_wheel
 
 | Light Mode | Num Threads | CPU Usage | Memory Usage| Min Time | Max Time | Avg Time |
 |:----------:|:-----------:|:---------:|:-----------:|:--------:|:--------:|:--------:|
-| No | 1 | 100% | 57.2 MB | 40 ms | 97 ms| 41 ms|
-| No | 2 | 165% | 58.5 MB | 29 ms | 137 ms| 32 ms|
+| No | 1 | 100% | 57.7 MB | 40 ms | 53 ms| 41 ms|
+| No | 2 | 165% | 58.4 MB | 29 ms | 62 ms| 32 ms|
+| Yes | 1 | 100% | 57.3 MB | 38 ms | 64 ms| 39 ms|
 | Yes | 2 | 165% | 57.9 MB | 27 ms | 53 ms| 28 ms|
 
 ### 1080P
 
 | Light Mode | Num Threads | CPU Usage | Memory Usage| Min Time | Max Time | Avg Time |
 |:----------:|:-----------:|:---------:|:-----------:|:--------:|:--------:|:--------:|
-| No | 1 | 100% |  MB |187 ms | 206ms| 190 ms|
-| No | 2 | 165% | 102 MB |138 ms | 239ms| 142 ms|
+| No | 1 | 100% | 102 MB |188 ms | 203 ms| 192 ms|
+| No | 2 | 160% | 102 MB |138 ms | 249 ms| 147 ms|
+| Yes | 1 | 100% | 101 MB | 179 ms | 190 ms | 183 ms|
 | Yes | 2 | 162% | 102 MB | 130 ms | 201 ms | 137 ms|
 
 ## MTCNN GPU C++
