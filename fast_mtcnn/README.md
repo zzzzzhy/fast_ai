@@ -13,9 +13,17 @@ python setup.py sdist bdist_wheel
 ```
 ## MTCNN NCNN NEON [Commit b5d653bd](https://github.com/solderzzc/fast_ai/tree/b5d653bd1107d1167a81fa858513cb1883509b37)
 
-| Light Mode | Num Threads | CPU Usage | Min Time | Max Time | Avg Time |
-|:----------:|:-----------:|:---------:|:--------:|:--------:|:--------:|
-| ❌ | 1 | 100% | 187ms | 206ms| 190 ms|
+### 480P
+
+| Light Mode | Num Threads | CPU Usage | Memory Usage| Min Time | Max Time | Avg Time |
+|:----------:|:-----------:|:---------:|:-----------:|:--------:|:--------:|:--------:|
+| ❌ | 1 | 100% | 57.2MB |40ms | 97ms| 41 ms|
+
+### 1080P
+
+| Light Mode | Num Threads | CPU Usage | Memory Usage| Min Time | Max Time | Avg Time |
+|:----------:|:-----------:|:---------:|:-----------:|:--------:|:--------:|:--------:|
+| ❌ | 1 | 100% |  MB |187ms | 206ms| 190 ms|
 
 
 ## MTCNN GPU C++
