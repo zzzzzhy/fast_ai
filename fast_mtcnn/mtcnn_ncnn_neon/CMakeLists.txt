@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.10)
 
 project(mtcnn_ncnn)
-
+add_subdirectory(pybind11)
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "build type not defined")
     set(CMAKE_BUILD_TYPE release CACHE STRING "Choose the type of build" FORCE)
@@ -46,16 +46,25 @@ link_directories(
 add_executable(main src/main.cpp src/utils.cpp src/mtcnn.cpp)
 target_link_libraries(main ncnn ${OpenCV_LIBS})
 set_target_properties(main
-        PROPERTIES 
+        PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
 #        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+)
+
+pybind11_add_module(face_detection src/py_face_detector.cpp src/utils.cpp src/mtcnn.cpp)
+target_link_libraries(face_detection PRIVATE ncnn ${OpenCV_LIBS})
+set_target_properties(face_detection
+        PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
 add_executable(benchmark src/benchmark.cpp src/utils.cpp src/mtcnn.cpp)
 target_link_libraries(benchmark ncnn ${OpenCV_LIBS})
 set_target_properties(benchmark
-        PROPERTIES 
+        PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
 #        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
@@ -64,7 +73,7 @@ set_target_properties(benchmark
 add_executable(test_picture src/test_picture.cpp src/utils.cpp src/mtcnn.cpp)
 target_link_libraries(test_picture ncnn ${OpenCV_LIBS})
 set_target_properties(test_picture
-        PROPERTIES 
+        PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
 #        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
@@ -73,7 +82,7 @@ set_target_properties(test_picture
 add_executable(test_video src/test_video.cpp src/utils.cpp src/mtcnn.cpp)
 target_link_libraries(test_video ncnn ${OpenCV_LIBS})
 set_target_properties(test_video
-        PROPERTIES 
+        PROPERTIES
 #        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
 #        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
