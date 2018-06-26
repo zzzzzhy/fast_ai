@@ -28,7 +28,7 @@ cp libdarknet.so ../export/
 
 | Model   | Runtime         | FLOPS |Memory Usage | CPU Usage        | Time Per Frame |
 |:-------:|:---------------:|:-----:|:-----------:|:----------------:|:--------------:|
-| Yolov2 Tiny voc | TVM GPU | 5.4G  |485 MB       | 14% (on one core)| 0.368s         |
+| Yolov2 Tiny voc | TVM GPU | 5.4G  |485 MB       | 14% (on one core)| 0.374s         |
 
 ### Image Load, Preprocessing
 
