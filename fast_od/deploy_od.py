@@ -85,6 +85,11 @@ m.run()
 done = time.time()
 print('first run {}'.format((done - start)/1))
 
+out_shape = (net.outputs,)
+tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
+print('tvm_out shape is {}'.format(tvm_out.shape))
+convert.calc_result(im_w, im_h, tvm_out)
+
 print("Running the test image...")
 start = time.time()
 for i in range(1000):
@@ -96,6 +101,8 @@ for i in range(1000):
   step_start = time.time()
   m.set_input('data', tvm.nd.array(data.astype(dtype)))
   m.run()
+  tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
+  convert.calc_result(im_w, im_h, tvm_out)
   step_done = time.time()
   print('step {} cost {}'.format(i,(step_done - step_start)))
 done = time.time()
@@ -103,6 +110,8 @@ print('everage cost {}'.format((done - start)/1000))
 # get outputs
 out_shape = (net.outputs,)
 tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
+
+print('tvm_out shape is {}'.format(tvm_out.shape))
 
 #do the detection and bring up the bounding boxes
 thresh = 0.24

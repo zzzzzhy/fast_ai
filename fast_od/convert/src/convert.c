@@ -1,12 +1,15 @@
 
-#include "stdlib.h" // import size_t
+#include <stdlib.h> // import size_t
+#include <string.h>
 #include "darknet.h" // import darknet
 
 const char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 
-void print_detector_detections(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
+char * print_detector_detections(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
 {
     int i, j;
+    char tmp[20*2048];
+    tmp[0] = 0;
     for(i = 0; i < total; ++i){
         float xmin = boxes[i].x - boxes[i].w/2. + 1;
         float xmax = boxes[i].x + boxes[i].w/2. + 1;
@@ -19,10 +22,11 @@ void print_detector_detections(char *id, box *boxes, float **probs, int total, i
         if (ymax > h) ymax = h;
 
         for(j = 0; j < classes; ++j){
-            if (probs[i][j]) printf("%s %f %f %f %f %f\n", voc_names[j], probs[i][j],
+            if (probs[i][j]) sprintf(tmp,"%s %s %f %f %f %f %f\n",tmp, voc_names[j], probs[i][j],
                     xmin, ymin, xmax, ymax);
         }
     }
+    return strdup(tmp);
 }
 
 void sample3d(size_t row_count, size_t column_count, size_t window_size, float *input, float *output) {
@@ -95,6 +99,7 @@ char * calc_result(int orig_w, int orig_h, size_t shape, float *output){
     int nboxes = 0;
     int j;
     int *map = 0;
+
     box *boxes = calloc(l.w*l.h*l.n, sizeof(box));
     float **probs = calloc(l.w*l.h*l.n, sizeof(float *));
     for(j = 0; j < l.w*l.h*l.n; ++j) probs[j] = calloc(l.classes + 1, sizeof(float *));
@@ -110,9 +115,9 @@ char * calc_result(int orig_w, int orig_h, size_t shape, float *output){
     get_region_boxes(l, orig_w, orig_h, net->w, net->h, thresh, probs, boxes, 0, 0, map, .5, 1);
     
     do_nms_sort(boxes, probs, l.w*l.h*l.n, l.classes, 0.3);
-    print_detector_detections(id, boxes, probs, l.w*l.h*l.n, classes, orig_w, orig_h);
+    char * result = print_detector_detections(id, boxes, probs, l.w*l.h*l.n, classes, orig_w, orig_h);
 
     free(boxes);
     free_ptrs((void **)probs, l.w*l.h*l.n);
-    return "OK";
+    return result;
 }

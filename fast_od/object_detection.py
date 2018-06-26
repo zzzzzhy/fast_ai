@@ -94,6 +94,9 @@ def detect(test_image):
     m.set_input('data', tvm.nd.array(data.astype(dtype)))
     m.run()
     tvm_out = m.get_output(0, tvm.nd.empty(out_shape, dtype)).asnumpy()
+    result = convert.calc_result(im_w, im_h, tvm_out)
+
+    return result
 
     probs= []
     boxes = []

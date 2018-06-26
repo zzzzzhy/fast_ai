@@ -1,0 +1,4 @@
+export/od.tar.so
+export/*.pyc
+convert/_convert.*
+export/*

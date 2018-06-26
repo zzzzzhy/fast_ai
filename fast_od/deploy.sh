@@ -7,6 +7,7 @@ docker run --rm --privileged \
      -v `pwd`/export:/export \
      -v `pwd`/runtime_gpu.sh:/root/runtime_gpu.sh \
      -v `pwd`/deploy_od.py:/root/deploy_od.py \
+     -v `pwd`/export/libdarknet.so:/usr/lib/libdarknet.so \
      -v `pwd`/export/_convert.so:/root/_convert.so \
      -v `pwd`/export/convert.py:/root/convert.py \
      -v `pwd`/export/od.tar:/root/od.tar \
