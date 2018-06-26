@@ -201,7 +201,7 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
     float minl = img_w<img_h?img_w:img_h;
     int MIN_DET_SIZE = 12;
-    int minsize = 80;
+    int minsize = 40;
     float m = (float)MIN_DET_SIZE/minsize;
     minl *= m;
     float factor = 0.709;
@@ -230,8 +230,8 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
         resize_bilinear(img_, in, ws, hs);
 
         ncnn::Extractor ex = pnet_.create_extractor();
-        ex.set_light_mode(false);
-        ex.set_num_threads(2);
+        ex.set_light_mode(true);
+        ex.set_num_threads(1);
         ex.input("data", in);
         ncnn::Mat score_, location_;
         ex.extract("prob1", score_);
@@ -272,8 +272,8 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             resize_bilinear(tempIm, in, 24, 24);
 
             ncnn::Extractor ex = rnet_.create_extractor();
-            ex.set_light_mode(false);
-            ex.set_num_threads(2);
+            ex.set_light_mode(true);
+            ex.set_num_threads(1);
             ex.input("data", in);
             ncnn::Mat score, bbox;
             ex.extract("prob1", score);
@@ -308,8 +308,8 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             ncnn::Mat in;
             resize_bilinear(tempIm, in, 48, 48);
             ncnn::Extractor ex = onet_.create_extractor();
-            ex.set_light_mode(false);
-            ex.set_num_threads(2);
+            ex.set_light_mode(true);
+            ex.set_num_threads(1);
 
             ex.input("data", in);
             ncnn::Mat score, bbox, keyPoint;
