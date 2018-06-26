@@ -11,15 +11,13 @@ apt-get install python-pip python-setuptools
 pip install wheel
 python setup.py sdist bdist_wheel
 ```
-## MTCNN NCNN [Commit 4e29bc](https://github.com/solderzzc/fast_ai/commit/4e29bc36e6bdcb0c9059a5362e653362fe7f9344)
-Just run `docker build .` to test mtcnn on NCNN.
+## MTCNN NCNN NEON [Commit b5d653bd](https://github.com/solderzzc/fast_ai/tree/b5d653bd1107d1167a81fa858513cb1883509b37)
 
-Docker image: solderzzc/rocketchat:mtcnn_ncnn
+| Light Mode | Num Threads | CPU Usage | Min Time | Max Time | Avg Time |
+|:----------:|:-----------:|:---------:|:--------:|:--------:|:--------:|
+| ❌ | 1 | 100% | 187ms | 206ms| 190 ms|
 
-| Runtime Lib | Run On | Thread Num |Computation Cost | Speed |
-| :---------: |:-----: |:----------:|:---------------:|:-----:|
-| NCNN | NEON | 1.5 core | 8 | 233ms |
-| NCNN | NEON | 1 core   | 1 | 135ms |
+
 ## MTCNN GPU C++
 
 ```
