@@ -11,8 +11,6 @@
 MTCNN *mm;
 
 void loop_test(std::string folder_path) {
-    std::string model_path = argv[1];
-    std::string folder_path = argv[2];
     std::vector<string> file_list;
     trave_dir(folder_path, file_list);
     std::cout << "file num: " << file_list.size() << std::endl;
@@ -124,13 +122,12 @@ std::string detect(std::string imagepath) {
     int detected = 0;
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty()) {
-        std::cerr << "cv::Imread failed. File Path: " << *it << std::endl;
+        std::cerr << "cv::Imread failed. File Path: " << imagepath << std::endl;
         return "{\"result\":[]}";
     }
     finalBbox.clear();
     int face_num = 0;
 
-    // exit(0);
     ncnn::Mat ncnn_img = ncnn::Mat::from_pixels(cv_img.data, ncnn::Mat::PIXEL_BGR2RGB, cv_img.cols, cv_img.rows);
 
     gettimeofday(&tv1,&tz1);
@@ -148,7 +145,7 @@ std::string detect(std::string imagepath) {
               result << ",";
             }
             face_num++;
-            count++;
+
             result <<   "{ \"score\" :" << (*it).score << ",";
             result <<   "   \"bbox\"  : [" << (*it).x1 << "," << (*it).y1 << "," <<(*it).x2 <<","<<(*it).y2<<"],";
             result <<   "   \"landmark\":[ ";
@@ -162,7 +159,9 @@ std::string detect(std::string imagepath) {
         }
     }
     result << "]}";
+    #ifdef __DEBUG__
     printf( "%s = %g ms \n ", "Detection time", getElapse(&tv1, &tv2) );
+    #endif
     return result.str();
 }
 PYBIND11_MODULE(face_detection, m) {
@@ -186,6 +185,9 @@ PYBIND11_MODULE(face_detection, m) {
         detect function
     )pbdoc");
 
+    m.def("init", &init, R"pbdoc(
+        init model
+    )pbdoc");
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else

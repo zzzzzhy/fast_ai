@@ -259,7 +259,9 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
     if(count<1)return;
     nms(firstBbox_, firstOrderScore_, nms_threshold[0]);
     refineAndSquareBbox(firstBbox_, img_h, img_w);
+    #ifdef __DEBUG__
     std::cout << "firstBbox_.size() = " << firstBbox_.size() << std::endl;
+    #endif
 
     //second stage
     count = 0;
@@ -294,7 +296,9 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             }
         }
     }
+    #ifdef __DEBUG__
     std::cout << "secondBbox_.size() = " << secondBbox_.size() << std::endl;    
+    #endif
     if(count<1)return;
     nms(secondBbox_, secondBboxScore_, nms_threshold[1]);
     refineAndSquareBbox(secondBbox_, img_h, img_w);
@@ -336,7 +340,9 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             }
         }
 
+    #ifdef __DEBUG__
     std::cout << "thirdBbox_.size() = " << thirdBbox_.size() << std::endl;
+    #endif
     if(count < 1)
         return;
     refineAndSquareBbox(thirdBbox_, img_h, img_w);
