@@ -18,7 +18,8 @@ parser.add_argument('--threshold', default=1.24, type=float, help='ver dist thre
 args = parser.parse_args()
 
 model = face_model.FaceModel(args)
-orig_img = cv2.imread('Tom_Hanks_54745.png')
+#orig_img = cv2.imread('Tom_Hanks_54745.png')
+orig_img = cv2.imread('1_854x480.jpg')
 
 start = time.time()
 img = model.get_input(orig_img)

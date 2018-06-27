@@ -18,3 +18,9 @@ docker tag armnn_aarch64:latest solderzzc/rocketchat:armnn_aarch64
 ```
 docker push solderzzc/rocketchat:armnn_aarch64
 ```
+
+## Pushed
+
+```
+solderzzc/rocketchat:armnn_aarch64
+```

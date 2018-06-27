@@ -30,9 +30,14 @@ RUN cd /root && wget https://github.com/tensorflow/tensorflow/archive/v${TF_VER}
 RUN cd /root && git clone https://github.com/jschmidt42/stb-cmake
 ADD ./Patchs/CMakeLists_tests.txt ${ARMNN_DIR}/tests/CMakeLists.txt
 ADD ./Patchs/CMakeLists.txt ${ARMNN_DIR}/CMakeLists.txt
+
+RUN cd /root && \
+    git clone https://github.com/BVLC/caffe && \
+    cd /root/caffe/src/caffe/proto && \
+    protoc --cpp_out=. caffe.proto
 RUN cd ${ARMNN_DIR} && sed -i 's/SHARED/STATIC/g' CMakeLists.txt && \
     mkdir build && cd build  && \
-    cmake -DBUILD_UNIT_TESTS=1 -DARMCOMPUTE_ROOT=$CL_DIR -DARMCOMPUTE_BUILD_DIR=$CL_DIR/build -DTF_GENERATED_SOURCES=/root/v$TF_VER/protobuf -DBUILD_TF_PARSER=1 -DPROTOBUF_ROOT=/usr -DBUILD_TESTS=1 -DTHIRD_PARTY_INCLUDE_DIRS="/root/stb-cmake" -DARMCOMPUTECL=ON -DARMCOMPUTENEON=OFF ../
+    cmake -DBUILD_UNIT_TESTS=1 -DARMCOMPUTE_ROOT=$CL_DIR -DARMCOMPUTE_BUILD_DIR=$CL_DIR/build -DTF_GENERATED_SOURCES=/root/v$TF_VER/protobuf -DBUILD_TF_PARSER=ON -DBUILD_CAFFE_PARSER=ON -DPROTOBUF_ROOT=/usr -DBUILD_TESTS=1 -DTHIRD_PARTY_INCLUDE_DIRS="/root/stb-cmake" -DARMCOMPUTECL=ON -DARMCOMPUTENEON=OFF -DCAFFE_GENERATED_SOURCES=/root/caffe/src ../
     
 RUN cd ${ARMNN_DIR}/build && make -j6
 

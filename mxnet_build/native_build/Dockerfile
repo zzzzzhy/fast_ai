@@ -2,9 +2,9 @@ FROM arm64v8/ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y build-essential git libatlas-base-dev  libblas-dev libopencv-dev \
-    python-pip python-dev python-numpy python-scipy scons
-
+    python-pip python-dev python-numpy python-scipy scons python-opencv python-sklearn python-skimage cmake
 RUN pip install --upgrade pip
+RUN pip install setuptools
 
 WORKDIR /build/
 
@@ -26,8 +26,8 @@ RUN make -j3
 RUN make install
 
 WORKDIR /build/MXNet-HRT 
-#RUN cd python && python setup.py install && \
-#    apt-get install -y python-opencv python-sklearn python-skimage && \
+RUN cd python && python setup.py install && \
+    apt-get install -y python-opencv python-sklearn python-skimage # && \
 #    rm -rf /build/MXNet-HRT
 
 WORKDIR /root
