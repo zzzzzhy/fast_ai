@@ -52,14 +52,14 @@ set_target_properties(main
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
 )
 
-pybind11_add_module(face_detection src/py_face_detector.cpp src/utils.cpp src/mtcnn.cpp)
+pybind11_add_module(face_detection src/py_face_detection.cpp src/utils.cpp src/mtcnn.cpp)
 target_link_libraries(face_detection PRIVATE ncnn ${OpenCV_LIBS})
-set_target_properties(face_detection
-        PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
-        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
-)
+#set_target_properties(face_detection
+#        PROPERTIES
+#        ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+#        LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib"
+#        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin"
+#)
 
 add_executable(benchmark src/benchmark.cpp src/utils.cpp src/mtcnn.cpp)
 target_link_libraries(benchmark ncnn ${OpenCV_LIBS})
