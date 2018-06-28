@@ -17,7 +17,7 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <chrono>
 
@@ -50,17 +50,20 @@ const char* class_names[] = {"background",
                             "motorbike", "person", "pottedplant",
                             "sheep", "sofa", "train", "tvmonitor"};
 
+ncnn::Net mobilenet;
+
+static void init(void) {
+  mobilenet.load_param("mobilenet_ssd_voc_ncnn.param");
+  mobilenet.load_model("mobilenet_ssd_voc_ncnn.bin");
+}
 static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
 {
-    ncnn::Net mobilenet;
     /*
      * model is  converted from https://github.com/chuanqi305/MobileNet-SSD
      * and can be downloaded from https://drive.google.com/open?id=0ByaKLD9QaPtucWk0Y0dha1VVY0U
      */
     int img_h = raw_img.size().height;
     int img_w = raw_img.size().width;
-    mobilenet.load_param("mobilenet_ssd_voc_ncnn.param");
-    mobilenet.load_model("mobilenet_ssd_voc_ncnn.bin");
     int input_size = 300;
     INIT_TIMER
     ncnn::Mat in = ncnn::Mat::from_pixels_resize(raw_img.data, ncnn::Mat::PIXEL_BGR, raw_img.cols, raw_img.rows, input_size, input_size);
@@ -70,10 +73,9 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
     in.substract_mean_normalize(mean_vals, norm_vals);
 
     ncnn::Mat out;
-
-    ncnn::Extractor ex = mobilenet.create_extractor();
-    ex.set_light_mode(false);
-    ex.set_num_threads(1);
+    ncnn::Extractor ex =  mobilenet.create_extractor();
+    ex.set_light_mode(true);
+    ex.set_num_threads(2);
 
     START_TIMER
     ex.input("data", in);
@@ -132,6 +134,7 @@ static int detect_mobilenet(cv::Mat& raw_img, float show_threshold)
 int main(int argc, char** argv)
 {
     const char* imagepath = argv[1];
+    init();
     INIT_TIMER
     std::cout << "Object Detection on Image: " << imagepath << "\n";
     START_TIMER
