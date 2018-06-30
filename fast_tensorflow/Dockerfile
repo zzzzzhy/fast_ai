@@ -49,10 +49,20 @@ RUN git clone http://github.com/codeplaysoftware/tensorflow && \
     export TF_SYCL_CROSS_TOOLCHAIN_NAME=aarch64-linux-gnu && \
     export TF_SYCL_BITCODE_TARGET=spirv64 && \
     ./configure && \
-    bazel --output_user_root=$TMPDIR build --config=sycl_arm --config=opt --verbose_failures //tensorflow/tools/pip_package:build_pip_package && \
+    bazel --output_user_root=$TMPDIR build --config=sycl_arm --config=opt --copt=-DNO_LOCAL_MEM --copt=-DEIGEN_DONT_VECTORIZE_SYCL --verbose_failures //tensorflow/tools/pip_package:build_pip_package && \
     bazel-bin/tensorflow/tools/pip_package/build_pip_package $TMPDIR && \
     mv $TMPDIR/tensorflow-1.6.0rc0-cp27-cp27mu-linux_x86_64.whl $TMPDIR/tensorflow-1.6.0rc0-cp27-cp27mu-linux_aarch64.whl
 
 
 
 #bazel --output_user_root=$TMPDIR build --config=sycl_arm -c opt --verbose_failures --copt=-DNO_LOCAL_MEM--copt=-DEIGEN_DONT_VECTORIZE_SYCL //tensorflow/tools/pip_package:build_pip_package
+
+
+#RUN git clone https://github.com/plaidml/plaidml
+
+#RUN apt-get update && apt-get install -y bison
+
+#ADD BUILD plaidml/BUILD
+
+#RUN cd plaidml && \
+#    bazel build --config linux_arm_64v8 plaidml:wheel plaidml/keras:wheel
