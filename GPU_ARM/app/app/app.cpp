@@ -3,6 +3,8 @@
 // See LICENSE file in the project root for full license information.
 //
 
+#include <chrono>
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -18,6 +20,7 @@
 
 #include "mnist_loader.hpp"
 
+using namespace std::chrono;
 
 // Helper function to make input tensors
 armnn::InputTensors MakeInputTensors(const std::pair<armnn::LayerBindingId,
@@ -93,12 +96,20 @@ int main(int argc, char** argv)
     };
 
     std::array<float, 1*513*513*3> image_data;
-    // armnn::Status ret = runtime->EnqueueWorkload(networkIdentifier,
     std::cout << "Just Enqueue WorkLoad" << std::endl;
-    runtime->EnqueueWorkload(networkIdentifier,
-                             MakeInputTensors(inputBindingInfo, &image_data[0]),
-                             outputTensors);
 
+    for(int i = 0; i < 100; i++){
+      high_resolution_clock::time_point t1 = high_resolution_clock::now();
+      // armnn::Status ret = runtime->EnqueueWorkload(networkIdentifier,
+      runtime->EnqueueWorkload(networkIdentifier,
+                               MakeInputTensors(inputBindingInfo, &image_data[0]),
+                               outputTensors);
+      high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+      auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+
+      std::cout << "Run time " << duration << std::endl;
+    }
     // Convert 1-hot output to an integer label and print
     // long int label = std::distance(output.begin(), std::max_element(output.begin(), output.end()));
     // std::cout << "Predicted: " << label << std::endl;
