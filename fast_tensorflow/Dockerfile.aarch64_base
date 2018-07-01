@@ -1,0 +1,15 @@
+FROM lambdazhang/raidcdn:tf_1.8_runtime_06272018
+ADD mali.icd /etc/OpenCL/vendors/mali.icd 
+RUN ln -s /usr/lib/libOpenCL.so /usr/lib/libOpenCL.so.1
+RUN apt-get update && apt-get install -y clinfo && ldconfig && clinfo
+COPY ComputeCpp-CE-0.8.0-Ubuntu.16.04-ARM64.tar.gz /root/ComputeCpp-CE-0.8.0-Ubuntu.16.04-ARM64.tar.gz
+WORKDIR /root
+RUN tar xf /root/ComputeCpp-CE-0.8.0-Ubuntu.16.04-ARM64.tar.gz 
+ENV LD_LIBRARY_PATH=/root/ComputeCpp-CE-0.8.0-Ubuntu-16.04-ARM_64/lib:$LD_LIBRARY_PATH
+RUN pip uninstall -y tensorflow
+RUN rm /root/ComputeCpp-CE-0.8.0-Ubuntu.16.04-ARM64.tar.gz
+#COPY ./export/tensorflow-1.6.0rc0-cp27-cp27mu-linux_aarch64.whl /root/tensorflow-1.6.0rc0-cp27-cp27mu-linux_aarch64.whl  
+#RUN pip install /root/tensorflow-1.6.0rc0-cp27-cp27mu-linux_aarch64.whl 
+#RUN rm /root/tensorflow-1.6.0rc0-cp27-cp27mu-linux_aarch64.whl && \
+
+
