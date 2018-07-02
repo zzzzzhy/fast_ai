@@ -1,0 +1,5 @@
+FROM solderzzc/rocketchat:tvm_06282018_x86
+RUN pip install onnx
+ADD onnx.py /build/tvm/nnvm/python/nnvm/frontend/onnx.py
+RUN cd /build/tvm/nnvm/python && \
+    python setup.py install --user

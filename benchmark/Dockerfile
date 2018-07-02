@@ -121,6 +121,12 @@ RUN cd /root && curl -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit
       --input_layer="image_tensor" --input_layer_shape=1,224,224,3 --input_layer_type=uint8 \
       --output_layer="detection_boxes,detection_scores,num_detections,detection_classes" --show_run_order=false --show_time=false \
       --show_memory=true --show_summary=true --show_flops=true
+ADD posenet.pb /root/posenet.pb
+RUN cd /tensorflow && bazel-bin/tensorflow/tools/graph_transforms/summarize_graph  --in_graph=/root/posenet.pb && \
+    bazel-bin/tensorflow/tools/benchmark/benchmark_model --graph=/root/posenet.pb --input_layer="image" --input_layer_shape=1,513,513,3 \
+    --input_layer_type="float32" \
+    --output_layer="heatmap,offset_2,displacement_fwd_2,displacement_bwd_2" \
+    --show_run_order=false --show_time=false --show_memory=true --show_summary=true --show_flops=true
 # TensorBoard
 EXPOSE 6006
 # IPython
