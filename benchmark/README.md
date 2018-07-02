@@ -4,11 +4,13 @@
 `docker build .` Inspect log to see the benchmark of Models.
 
 ### Facenet
-2.83 BFlops (GFlops)
+2.83 BFLOPs (GFLOPs)
 
 ### Mobilenetv2 SSDLite
-1.50 BFlops (GFlops)
+1.50 BFLOPs (GFLOPs)
 
+### PoseNet(Mobilenet)
+3.82 BFLOPs (GFLOPs)
 
 ## Reference
 
