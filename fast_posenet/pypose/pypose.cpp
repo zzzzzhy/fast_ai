@@ -26,6 +26,7 @@ class Pose {
 
         void init(void);
         int detect(void);
+        void loop_test(void);
 
         std::string go(int n_times) {
             std::string result;
@@ -38,6 +39,8 @@ class Pose {
         int num = 0;
         armnnTfParser::ITfParserPtr parser = armnnTfParser::ITfParserPtr(nullptr, nullptr);
         armnn::INetworkPtr network = armnn::INetworkPtr(nullptr, nullptr);
+        armnn::IRuntimePtr runtime = armnn::IRuntimePtr(nullptr, nullptr);
+
 };
 
 // Helper function to make input tensors
@@ -56,12 +59,12 @@ void Pose::init(void) {
                                                                      "offset_2",
                                                                      "displacement_fwd_2",
                                                                      "displacement_bwd_2" });
+
+    this->runtime = armnn::IRuntime::Create(armnn::Compute::GpuAcc);
 }
 
 int Pose::detect(void)
 {
-    armnn::IRuntimePtr runtime=armnn::IRuntime::Create(armnn::Compute::GpuAcc);
-
     // Find the binding points for the input and output nodes
     armnnTfParser::BindingPointInfo inputBindingInfo = this->parser->GetNetworkInputBindingInfo("image");
     // Run a single inference on the test image
