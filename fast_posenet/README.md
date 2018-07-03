@@ -1,3 +1,7 @@
+## How to
+```
+./run.sh
+```
 
 ## Performance
 
