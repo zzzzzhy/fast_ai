@@ -36,6 +36,22 @@ class CMakeBuild(build_ext):
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
 
+        env = os.environ.copy()
+        CLDIR=env['CL_DIR']
+        TF_VER=env['TF_VER']
+        cmake_args += [ '-DBUILD_UNIT_TESTS=OFF',
+                        '-DARMCOMPUTE_ROOT='+CLDIR,
+                        '-DARMCOMPUTE_BUILD_DIR='+CLDIR+'/build',
+                        '-DTF_GENERATED_SOURCES=/root/v'+TF_VER+'/protobuf',
+                        '-DBUILD_TF_PARSER=ON',
+                        '-DBUILD_CAFFE_PARSER=ON',
+                        '-DPROTOBUF_ROOT=/usr',
+                        '-DBUILD_TESTS=OFF',
+                        '-DTHIRD_PARTY_INCLUDE_DIRS="/root/stb-cmake"',
+                        '-DARMCOMPUTECL=ON',
+                        '-DARMCOMPUTENEON=OFF',
+                        '-DCAFFE_GENERATED_SOURCES=/root/caffe/src'
+                    ]
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
@@ -46,9 +62,8 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j6']
 
-        env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):

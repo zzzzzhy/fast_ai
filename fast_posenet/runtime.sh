@@ -1,6 +1,5 @@
 #!/bin/bash
 
 cd /root/armnn/pypose
-make -C /root/armnn/build/
-cp /root/armnn/build/pypose/pose.so ./
+pip install ../dist/pose-1.0.0-cp27-cp27mu-linux_aarch64.whl
 python test.py
