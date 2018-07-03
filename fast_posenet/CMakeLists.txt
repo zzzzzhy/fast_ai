@@ -16,7 +16,7 @@ if (BUILD_TESTS)
 endif()
 
 add_subdirectory(pybind11)
-add_subdirectory(app)
+add_subdirectory(pypose)
 
 # Include the additional cmake files in their own target so that they will appear nicely in IDEs
 add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
