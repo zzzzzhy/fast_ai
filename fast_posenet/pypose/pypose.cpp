@@ -16,7 +16,29 @@
 #include "armnn/INetwork.hpp"
 #include "armnnTfParser/ITfParser.hpp"
 
+namespace py = pybind11;
 using namespace std::chrono;
+
+class Pose {
+    public:
+        Pose() { };
+        ~Pose() { };
+
+        void init(void);
+        int detect(void);
+
+        std::string go(int n_times) {
+            std::string result;
+            for (int i=0; i<num; ++i)
+                result += "woof! ";
+            num ++;
+            return result;
+        };
+
+        int num = 0;
+        armnnTfParser::ITfParserPtr parser = armnnTfParser::ITfParserPtr(nullptr, nullptr);
+        armnn::INetworkPtr network = armnn::INetworkPtr(nullptr, nullptr);
+};
 
 // Helper function to make input tensors
 armnn::InputTensors MakeInputTensors(const std::pair<armnn::LayerBindingId,
@@ -26,23 +48,22 @@ armnn::InputTensors MakeInputTensors(const std::pair<armnn::LayerBindingId,
     return { { input.first, armnn::ConstTensor(input.second, inputTensorData) } };
 }
 
-
-
-void init(){
-}
-int detect()
-{
-    armnnTfParser::ITfParserPtr parser = armnnTfParser::ITfParser::Create();
-    armnn::INetworkPtr network = parser->CreateNetworkFromBinaryFile("model/posenet.pb",
+void Pose::init(void) {
+    this->parser = armnnTfParser::ITfParser::Create();
+    this->network = parser->CreateNetworkFromBinaryFile("model/posenet.pb",
                                                                    { {"image", {1, 513, 513, 3}}},
                                                                    { "heatmap",
                                                                      "offset_2",
                                                                      "displacement_fwd_2",
                                                                      "displacement_bwd_2" });
+}
+
+int Pose::detect(void)
+{
     armnn::IRuntimePtr runtime=armnn::IRuntime::Create(armnn::Compute::GpuAcc);
 
     // Find the binding points for the input and output nodes
-    armnnTfParser::BindingPointInfo inputBindingInfo = parser->GetNetworkInputBindingInfo("image");
+    armnnTfParser::BindingPointInfo inputBindingInfo = this->parser->GetNetworkInputBindingInfo("image");
     // Run a single inference on the test image
 
     std::vector<float> heatmap(1*33*33*384);
@@ -51,7 +72,7 @@ int detect()
     std::vector<float> displacement_bwd_2(1*33*33*32);
 
     // Optimize the network for a specific runtime compute device, e.g. CpuAcc, GpuAcc, CpuRef
-    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*network, runtime->GetDeviceSpec());
+    armnn::IOptimizedNetworkPtr optNet = armnn::Optimize(*(this->network), runtime->GetDeviceSpec());
 
     // Load the optimized network onto the runtime device
     armnn::NetworkId networkIdentifier;
@@ -86,30 +107,11 @@ int detect()
     // std::cout << "   Actual: " << input->label << std::endl;
     return 0;
 }
+
 PYBIND11_MODULE(pose, m) {
-    m.doc() = R"pbdoc(
-        Pose For Realtime
-        -----------------------
-
-        .. currentmodule:: pose
-
-        .. autosummary::
-           :toctree: _generate
-
-           detect
-    )pbdoc";
-
-    m.def("detect", &detect, R"pbdoc(
-        detect function
-    )pbdoc");
-
-    m.def("init", &init, R"pbdoc(
-        init model
-    )pbdoc");
-
-#ifdef VERSION_INFO
-    m.attr("__version__") = VERSION_INFO;
-#else
-    m.attr("__version__") = "dev";
-#endif
+    py::class_<Pose>(m, "Pose")
+      .def(py::init<>())
+      .def("go", &Pose::go)
+      .def("init", &Pose::init)
+      .def("detect", &Pose::detect);
 }
