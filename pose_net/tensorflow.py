@@ -400,7 +400,6 @@ def _concatV2():
 
 def _concat():
     def _impl(inputs, attr, params):
-        print(inputs)
         pop_node = inputs.pop(0)
         axis = params[pop_node.list_output_names()[0]]
         params.pop(pop_node.list_output_names()[0])
@@ -450,15 +449,7 @@ def _fused_batch_norm():
             ignores=['data_format'],
             disables=['momentum'])(inputs, attr)
     return _impl
-def _sigmoid():
-    def _impl(inputs, attr, params):
-        print('inputs of sigmoid:{}'.format(inputs))
-        #pop_node = inputs.pop(0)
-        #axis = params[pop_node.list_output_names()[0]]
-        #print('output of sigmoid:{}'.format(axis))
-        return inputs[0]
 
-    return _impl
 def _batch_norm():
     def _impl(inputs, attr, params):
         # Rearrange inputs from
@@ -520,9 +511,9 @@ _convert_map = {
     'Squeeze'                           : _squeeze(),
     'FusedBatchNorm'                    : _fused_batch_norm(),
     'Relu6'                             : _relu6(),
-    'Sigmoid'                           : _sigmoid(),
     'DepthwiseConv2dNative'             : _depthwise_conv(),
     'Shape'                             : _shape(),
+    'Sigmoid'                           : AttrCvt('sigmoid'),
 }
 
 
@@ -773,8 +764,7 @@ class GraphProto(object):
             for k, i in zip(list(node_output), range(len(node_output))):
                 self._nodes[k] = op[i]
             inputs = [op]
-        elif op_name == "Sigmoid":
-            print('Sigmoid Activation')
+
         return inputs
 
 def from_tensorflow(graph):

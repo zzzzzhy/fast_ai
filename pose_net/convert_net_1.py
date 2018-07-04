@@ -18,9 +18,11 @@ def convert(net, params, data_shape, dtype, target_host):
     # compile
     opt_level = 2 if dtype == 'float32' else 1
     with nnvm.compiler.build_config(opt_level=opt_level):
+        print("Compiling")
         graph, lib, params = nnvm.compiler.build(
-            net, tvm.target.mali(), shape={"data": data_shape}, params=params,
+            net, tvm.target.mali(), shape={"image": data_shape}, params=params,
             dtype=dtype, target_host=target_host)
+        print("Compiling Done")
 
     lib.export_library('./net1.tar')
 
@@ -44,5 +46,7 @@ with tf.gfile.FastGFile(os.path.join(
 
     tf.import_graph_def(graph_def, name='')
     graph_def = tf.get_default_graph().as_graph_def(add_shapes=True)
+print("Loading")
 nnvm_net, nnvm_params = nnvm.frontend.from_tensorflow(graph_def)
-convert(nnvm_net, nnvm_params, (1, 3, 112, 112) ,'float32','llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon')
+print("Loading Done")
+convert(nnvm_net, nnvm_params, (1,513, 513, 3) ,'float32','llvm --system-lib -target=aarch64-linux-gnu -mattr=+neon')
