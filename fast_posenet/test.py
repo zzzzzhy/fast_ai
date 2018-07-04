@@ -7,7 +7,7 @@ width = 513
 height = 513
 
 d = m()
-d.init("model/posenet.pb")
+d.init("./pypose/model/posenet.pb")
 
 def read_imgfile(path, width, height):
     img = cv2.imread(path)
@@ -23,7 +23,7 @@ displacement_fwd_2 = np.ndarray(shape=(1,33,33,32), dtype=np.float32)
 displacement_bwd_2 = np.ndarray(shape=(1,33,33,32), dtype=np.float32)
 
 start = time.time()
-input_image = read_imgfile("./images/tennis_in_crowd.jpg",width,height)
+input_image = read_imgfile("./pypose/images/tennis_in_crowd.jpg",width,height)
 input_image = np.array(input_image,dtype=np.float32)
 input_image = input_image.reshape(1,width,height,3)
 
@@ -35,12 +35,12 @@ ret = d.detect(input_image,heatmap,offset_2,displacement_fwd_2,displacement_bwd_
 start = time.time()
 for i in range(1000):
     step_start = time.time()
-    input_image = read_imgfile("./images/tennis_in_crowd.jpg",width,height)
+    input_image = read_imgfile("./pypose/images/tennis_in_crowd.jpg",width,height)
     input_image = np.array(input_image,dtype=np.float32)
     input_image = input_image.reshape(1,width,height,3)
 
     ret = d.detect(input_image,heatmap,offset_2,displacement_fwd_2,displacement_bwd_2)
     step_end = time.time()
-    print("step {} took: {}".format( i,end-start))
+    print("step {} took: {}".format( i,step_end-step_start))
 end = time.time()
 print("Everage : {}".format((end-start)/1000))
