@@ -1,0 +1,4 @@
+FROM solderzzc/rocketchat:tvm_07042018_gpu
+ADD tensorflow.py /build/tvm/nnvm/python/nnvm/frontend/tensorflow.py
+RUN cd /build/tvm/nnvm/python && \
+    python setup.py install --user
