@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM tensorflow/tensorflow:1.8.0-devel-gpu
 
 RUN apt-get update && apt-get install -y python python-dev python-setuptools gcc libtinfo-dev zlib1g-dev \
     git wget cmake build-essential unzip libedit-dev
