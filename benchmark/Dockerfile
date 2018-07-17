@@ -128,6 +128,8 @@ RUN cd /tensorflow && bazel-bin/tensorflow/tools/graph_transforms/summarize_grap
     --output_layer="heatmap,offset_2,displacement_fwd_2,displacement_bwd_2" \
     --show_run_order=false --show_time=false --show_memory=true --show_summary=true --show_flops=true
 # TensorBoard
+ADD lapsrn.pb /root/lapsrn.pb
+RUN cd /tensorflow && bazel-bin/tensorflow/tools/graph_transforms/summarize_graph  --in_graph=/root/lapsrn.pb
 EXPOSE 6006
 # IPython
 EXPOSE 8888
