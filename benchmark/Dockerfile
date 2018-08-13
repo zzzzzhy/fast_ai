@@ -129,7 +129,9 @@ RUN cd /tensorflow && bazel-bin/tensorflow/tools/graph_transforms/summarize_grap
     --show_run_order=false --show_time=false --show_memory=true --show_summary=true --show_flops=true
 # TensorBoard
 ADD lapsrn.pb /root/lapsrn.pb
-RUN cd /tensorflow && bazel-bin/tensorflow/tools/graph_transforms/summarize_graph  --in_graph=/root/lapsrn.pb
+RUN cd /tensorflow && bazel-bin/tensorflow/tools/graph_transforms/summarize_graph  --in_graph=/root/lapsrn.pb && \
+    bazel-bin/tensorflow/tools/benchmark/benchmark_model --graph=/root/lapsrn.pb --show_flops --input_layer=input_image --input_layer_type=float --input_layer_shape=1,271,350,3 --output_layer=LapSRN/Model_level_1/add_image
+
 EXPOSE 6006
 # IPython
 EXPOSE 8888

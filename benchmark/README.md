@@ -12,6 +12,9 @@
 ### PoseNet(Mobilenet)
 3.82 BFLOPs (GFLOPs)
 
+### LapSRN
+496.71 BFLOPs (GFLOPs)
+
 ## Reference
 
 https://github.com/onnx/tensorflow-onnx/blob/master/tests/run_pretrained_models.yaml
