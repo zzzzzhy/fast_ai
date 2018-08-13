@@ -2,15 +2,18 @@ FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y git scons cmake wget unzip curl build-essential \
     libprotobuf-dev protobuf-compiler libopencv-dev python-pip python-setuptools python-dev
-WORKDIR /root
-ADD ./mtcnn-ncnn /root/lib_mtcnn
-RUN cd lib_mtcnn && \
-    mkdir build && cd build && \
-    cmake ../ && make -j6
-RUN find . -name *.a
-ADD ./mtcnn_ncnn_neon /root/mtcnn
-RUN cp /root/lib_mtcnn/build/src/libncnn.a /root/mtcnn/lib/ncnn/
 WORKDIR /root/mtcnn
+ADD ./mtcnn-ncnn /root/mtcnn
 RUN pip install wheel && \
     python setup.py sdist bdist_wheel
+#RUN cd lib_mtcnn && \
+#    mkdir build && cd build && \
+#    cmake ../ && make -j6
+#RUN ./build/mtcnn/mtcnn ./1_854x480.jpg
+#RUN find . -name *.a
+#ADD ./mtcnn_ncnn_neon /root/mtcnn
+#RUN cp /root/lib_mtcnn/build/src/libncnn.a /root/mtcnn/lib/ncnn/
+#WORKDIR /root/mtcnn
+#RUN pip install wheel && \
+#    python setup.py sdist bdist_wheel
 #RUN ../build/mtcnn/mtcnn ./1_854x480.jpg

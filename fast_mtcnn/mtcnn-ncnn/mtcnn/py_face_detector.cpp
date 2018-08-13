@@ -31,12 +31,12 @@ static float getElapse(struct timeval *tv1,struct timeval *tv2)
 
 mtcnn::mtcnn(){
     std::cout << "init model,loading";
-    Pnet.load_param("det1.param");
-    Pnet.load_model("det1.bin");
-    Rnet.load_param("det2.param");
-    Rnet.load_model("det2.bin");
-    Onet.load_param("det3.param");
-    Onet.load_model("det3.bin");
+    Pnet.load_param("./model/det1.param");
+    Pnet.load_model("./model/det1.bin");
+    Rnet.load_param("./model/det2.param");
+    Rnet.load_model("./model/det2.bin");
+    Onet.load_param("./model/det3.param");
+    Onet.load_model("./model/det3.bin");
 }
 
 void mtcnn::generateBbox(ncnn::Mat score, ncnn::Mat location, std::vector<Bbox>& boundingBox_, std::vector<orderScore>& bboxScore_, float scale){
@@ -415,6 +415,9 @@ int loop_test(std::string imagepath,int total_count)
     //cv::waitKey(0);
     return 0;
 }
+void init(std::string model_path){
+  std::cout << "MODEL path must be ./model, it is hard coded" << std::endl;
+}
 std::string detect(std::string imagepath)
 {
     struct timeval  tv1,tv2;
@@ -446,11 +449,11 @@ std::string detect(std::string imagepath)
     int count = 0;
     for(vector<Bbox>::iterator it=finalBbox.begin(); it!=finalBbox.end();it++){
         if((*it).exist){
-            count++;
 
-            if (it != finalBbox.begin()){
+            if (count != 0){
               result << ",";
             }
+            count++;
             result <<   "{ \"score\" :" << (*it).score << ",";
             result <<   "   \"bbox\"  : [" << (*it).x1 << "," << (*it).y1 << "," <<(*it).x2 <<","<<(*it).y2<<"],";
             result <<   "   \"landmark\":[ ";
@@ -487,6 +490,9 @@ PYBIND11_MODULE(face_detection, m) {
 
     m.def("detect", &detect, R"pbdoc(
         detect function
+    )pbdoc");
+    m.def("init", &init, R"pbdoc(
+        init model
     )pbdoc");
 
 #ifdef VERSION_INFO
