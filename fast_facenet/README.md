@@ -85,3 +85,9 @@ apt-get install -y python-opencv python-sklearn python-skimage
 pip install -r requirements.txt
 python test_detection.py --model ../model-y1-test2/model,0
 ```
+
+
+## To build tf1.8_mxnet_r50_am
+```
+docker build -f Dockerfile.x86 -t solderzzc/rockchat:tf1.8_mxnet_r50_am .
+```
