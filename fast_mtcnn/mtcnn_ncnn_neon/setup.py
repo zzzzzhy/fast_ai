@@ -58,7 +58,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='face_detection',
-    version='2.1.0',
+    version='2.2.0',
     author='DeepEye Team',
     author_email='admin@deepeye.com',
     description='Face Detection module for Python',

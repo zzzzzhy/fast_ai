@@ -186,6 +186,14 @@ void MTCNN::refineAndSquareBbox(vector<Bbox> &vecBbox, const int &height, const 
     }
 }
 
+void MTCNN::setMinSize(int min){
+    this->min_size = min;
+}
+void MTCNN::setThreshold(float t1,float t2,float t3){
+    this->threshold[0] = t1;
+    this->threshold[1] = t2;
+    this->threshold[2] = t3;
+}
 void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
     firstBbox_.clear();
     firstOrderScore_.clear();
@@ -201,8 +209,8 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
     float minl = img_w<img_h?img_w:img_h;
     int MIN_DET_SIZE = 12;
-    int minsize = 40;
-    float m = (float)MIN_DET_SIZE/minsize;
+    //int minsize = 40;
+    float m = (float)MIN_DET_SIZE/this->min_size;
     minl *= m;
     float factor = 0.709;
     int factor_count = 0;

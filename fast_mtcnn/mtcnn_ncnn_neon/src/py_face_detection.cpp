@@ -115,6 +115,12 @@ void loop_test(std::string folder_path) {
 void init(std::string model_path){
   mm=new MTCNN(model_path);
 }
+void set_minsize(int min_size){
+  mm->setMinSize(min_size);
+}
+void set_threshold(float f1,float f2,float f3){
+  mm->setThreshold(f1,f2,f3);
+}
 std::string detect(std::string imagepath) {
     struct timeval  tv1,tv2;
     struct timezone tz1,tz2;
@@ -183,6 +189,14 @@ PYBIND11_MODULE(face_detection, m) {
 
     m.def("detect", &detect, R"pbdoc(
         detect function
+    )pbdoc");
+
+    m.def("set_minsize", &set_minsize, R"pbdoc(
+        set min size function
+    )pbdoc");
+
+    m.def("set_threshold", &set_threshold, R"pbdoc(
+        set min size function
     )pbdoc");
 
     m.def("init", &init, R"pbdoc(

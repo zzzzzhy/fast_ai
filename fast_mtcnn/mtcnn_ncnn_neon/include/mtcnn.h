@@ -32,6 +32,8 @@ public:
     MTCNN();
     MTCNN(const std::string& model_path);
     void detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox);
+    void setMinSize(int min);
+    void setThreshold(float t1,float t2,float t3);
 
 private:
     void generateBbox(ncnn::Mat score, ncnn::Mat location, vector<Bbox>& boundingBox_, vector<orderScore>& bboxScore_, float scale);
@@ -42,9 +44,10 @@ private:
     ncnn::Mat img;
 
     const float nms_threshold[3] = {0.5, 0.7, 0.7};
-    const float threshold[3] = {0.7, 0.6, 0.7};
     const float mean_vals[3] = {127.5, 127.5, 127.5};
     const float norm_vals[3] = {0.0078125, 0.0078125, 0.0078125};
+    float threshold[3] = {0.7, 0.6, 0.7};
+    int min_size = 40;
     std::vector<Bbox> firstBbox_, secondBbox_,thirdBbox_;
     
     std::vector<orderScore> firstOrderScore_, secondBboxScore_, thirdBboxScore_;
