@@ -34,6 +34,7 @@ public:
     void detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox);
     void setMinSize(int min);
     void setThreshold(float t1,float t2,float t3);
+    void setNumThreads(int num_thread);
 
 private:
     void generateBbox(ncnn::Mat score, ncnn::Mat location, vector<Bbox>& boundingBox_, vector<orderScore>& bboxScore_, float scale);
@@ -48,6 +49,7 @@ private:
     const float norm_vals[3] = {0.0078125, 0.0078125, 0.0078125};
     float threshold[3] = {0.7, 0.6, 0.7};
     int min_size = 40;
+    int num_threads = 1;
     std::vector<Bbox> firstBbox_, secondBbox_,thirdBbox_;
     
     std::vector<orderScore> firstOrderScore_, secondBboxScore_, thirdBboxScore_;

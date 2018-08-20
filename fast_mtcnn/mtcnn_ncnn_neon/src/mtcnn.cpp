@@ -194,6 +194,9 @@ void MTCNN::setThreshold(float t1,float t2,float t3){
     this->threshold[1] = t2;
     this->threshold[2] = t3;
 }
+void MTCNN::setNumThreads(int num_threads){
+    this->num_threads = num_threads;
+}
 void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
     firstBbox_.clear();
     firstOrderScore_.clear();
@@ -239,7 +242,7 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
         ncnn::Extractor ex = pnet_.create_extractor();
         ex.set_light_mode(true);
-        ex.set_num_threads(1);
+        ex.set_num_threads(this->num_threads);
         ex.input("data", in);
         ncnn::Mat score_, location_;
         ex.extract("prob1", score_);
@@ -283,7 +286,7 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
             ncnn::Extractor ex = rnet_.create_extractor();
             ex.set_light_mode(true);
-            ex.set_num_threads(1);
+            ex.set_num_threads(this->num_threads);
             ex.input("data", in);
             ncnn::Mat score, bbox;
             ex.extract("prob1", score);
@@ -321,7 +324,7 @@ void MTCNN::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             resize_bilinear(tempIm, in, 48, 48);
             ncnn::Extractor ex = onet_.create_extractor();
             ex.set_light_mode(true);
-            ex.set_num_threads(1);
+            ex.set_num_threads(this->num_threads);
 
             ex.input("data", in);
             ncnn::Mat score, bbox, keyPoint;

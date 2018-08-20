@@ -121,6 +121,9 @@ void set_minsize(int min_size){
 void set_threshold(float f1,float f2,float f3){
   mm->setThreshold(f1,f2,f3);
 }
+void set_num_threads(int num_threads){
+  mm->setNumThreads(num_threads);
+}
 std::string detect(std::string imagepath) {
     struct timeval  tv1,tv2;
     struct timezone tz1,tz2;
@@ -196,7 +199,11 @@ PYBIND11_MODULE(face_detection, m) {
     )pbdoc");
 
     m.def("set_threshold", &set_threshold, R"pbdoc(
-        set min size function
+        set threshold function
+    )pbdoc");
+
+    m.def("set_num_threads", &set_num_threads, R"pbdoc(
+        set threshold function
     )pbdoc");
 
     m.def("init", &init, R"pbdoc(

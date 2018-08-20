@@ -1,4 +1,5 @@
-FROM lambdazhang/raidcdn:tf_1.8_runtime_06272018
+FROM lambdazhang/raidcdn:deepeye_workaipython_08132018
+
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y git scons cmake wget unzip curl build-essential \
     libprotobuf-dev protobuf-compiler libopencv-dev python-pip python-setuptools python-dev
