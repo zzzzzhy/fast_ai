@@ -31,6 +31,9 @@ class mtcnn{
 public:
     mtcnn();
     void detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox);
+    void setMinSize(int min_size);
+    void setThreshold(float f1,float f2,float f3);
+    void setNumThreads(int num_threads);
 private:
     void generateBbox(ncnn::Mat score, ncnn::Mat location, vector<Bbox>& boundingBox_, vector<orderScore>& bboxScore_, float scale);
     void nms(vector<Bbox> &boundingBox_, std::vector<orderScore> &bboxScore_, const float overlap_threshold, string modelname="Union");
@@ -40,7 +43,9 @@ private:
     ncnn::Mat img;
 
     const float nms_threshold[3] = {0.5, 0.7, 0.7};
-    const float threshold[3] = {0.6, 0.6, 0.6};
+    float threshold[3] = {0.6, 0.6, 0.6};
+    int num_threads = 1;
+    int min_size = 40;
     const float mean_vals[3] = {127.5, 127.5, 127.5};
     const float norm_vals[3] = {0.0078125, 0.0078125, 0.0078125};
     std::vector<Bbox> firstBbox_, secondBbox_,thirdBbox_;

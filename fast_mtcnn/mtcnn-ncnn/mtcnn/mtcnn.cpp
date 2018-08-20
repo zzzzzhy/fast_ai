@@ -38,6 +38,17 @@ mtcnn::mtcnn(){
     Onet.load_model("det3.bin");
 }
 
+void mtcnn::setMinSize(int min_size){
+    this->min_size = min_size;
+}
+void mtcnn::setThreshold(float f1,float f2,float f3){
+    this->threshold[0] = f1;
+    this->threshold[1] = f2;
+    this->threshold[2] = f3;
+}
+void mtcnn::setNumThreads(int num_threads){
+    this->num_threads = num_threads;
+}
 void mtcnn::generateBbox(ncnn::Mat score, ncnn::Mat location, std::vector<Bbox>& boundingBox_, std::vector<orderScore>& bboxScore_, float scale){
     int stride = 2;
     int cellsize = 12;
@@ -177,7 +188,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
     float minl = img_w<img_h?img_w:img_h;
     int MIN_DET_SIZE = 12;
-    int minsize = 40;
+    int minsize = this->min_size;
     float m = (float)MIN_DET_SIZE/minsize;
     minl *= m;
     float factor = 0.709;
@@ -201,7 +212,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
         //in.substract_mean_normalize(mean_vals, norm_vals);
         ncnn::Extractor ex = Pnet.create_extractor();
         ex.set_light_mode(true);
-        ex.set_num_threads(1);
+        ex.set_num_threads(this->num_threads);
         ex.input("data", in);
         ncnn::Mat score_, location_;
         ex.extract("prob1", score_);
@@ -239,7 +250,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             resize_bilinear(tempIm, in, 24, 24);
             ncnn::Extractor ex = Rnet.create_extractor();
             ex.set_light_mode(true);
-            ex.set_num_threads(1);
+            ex.set_num_threads(this->num_threads);
             ex.input("data", in);
             ncnn::Mat score, bbox;
             ex.extract("prob1", score);
@@ -274,7 +285,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             resize_bilinear(tempIm, in, 48, 48);
             ncnn::Extractor ex = Onet.create_extractor();
             ex.set_light_mode(true);
-            ex.set_num_threads(8);
+            ex.set_num_threads(this->num_threads);
             ex.input("data", in);
             ncnn::Mat score, bbox, keyPoint;
             ex.extract("prob1", score);

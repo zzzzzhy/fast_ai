@@ -178,7 +178,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
 
     float minl = img_w<img_h?img_w:img_h;
     int MIN_DET_SIZE = 12;
-    int minsize = 40;
+    int minsize = this->min_size;
     float m = (float)MIN_DET_SIZE/minsize;
     minl *= m;
     float factor = 0.709;
@@ -202,7 +202,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
         //in.substract_mean_normalize(mean_vals, norm_vals);
         ncnn::Extractor ex = Pnet.create_extractor();
         ex.set_light_mode(true);
-        ex.set_num_threads(1);
+        ex.set_num_threads(this->num_threads);
         ex.input("data", in);
         ncnn::Mat score_, location_;
         ex.extract("prob1", score_);
@@ -241,7 +241,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             ncnn::Mat score, bbox;
             ncnn::Extractor ex = Rnet.create_extractor();
             ex.set_light_mode(false);
-            ex.set_num_threads(1);
+            ex.set_num_threads(this->num_threads);
             ex.input("data", in);
             ex.extract("prob1", score);
             ex.extract("conv5-2", bbox);
@@ -275,7 +275,7 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
             resize_bilinear(tempIm, in, 48, 48);
             ncnn::Extractor ex = Onet.create_extractor();
             ex.set_light_mode(false);
-            ex.set_num_threads(1);
+            ex.set_num_threads(this->num_threads);
             ex.input("data", in);
             ncnn::Mat score, bbox, keyPoint;
             ex.extract("prob1", score);
@@ -307,7 +307,17 @@ void mtcnn::detect(ncnn::Mat& img_, std::vector<Bbox>& finalBbox_){
     nms(thirdBbox_, thirdBboxScore_, nms_threshold[2], "Min");
     finalBbox_ = thirdBbox_;
 }
-
+void mtcnn::setMinSize(int min_size){
+    this->min_size = min_size;
+}
+void mtcnn::setThreshold(float f1,float f2,float f3){
+    this->threshold[0] = f1;
+    this->threshold[1] = f2;
+    this->threshold[2] = f3;
+}
+void mtcnn::setNumThreads(int num_threads){
+    this->num_threads = num_threads;
+}
 void test_video() {
 	std::string model_path = "../models";
 	cv::VideoCapture mVideoCapture(0);
@@ -418,6 +428,16 @@ int loop_test(std::string imagepath,int total_count)
 void init(std::string model_path){
   std::cout << "MODEL path must be ./model, it is hard coded" << std::endl;
 }
+
+void set_minsize(int min_size){
+  mm.setMinSize(min_size);
+}
+void set_threshold(float f1,float f2,float f3){
+  mm.setThreshold(f1,f2,f3);
+}
+void set_num_threads(int num_threads){
+  mm.setNumThreads(num_threads);
+}
 std::string detect(std::string imagepath)
 {
     struct timeval  tv1,tv2;
@@ -491,6 +511,19 @@ PYBIND11_MODULE(face_detection, m) {
     m.def("detect", &detect, R"pbdoc(
         detect function
     )pbdoc");
+
+    m.def("set_minsize", &set_minsize, R"pbdoc(
+        set min size function
+    )pbdoc");
+
+    m.def("set_threshold", &set_threshold, R"pbdoc(
+        set threshold function
+    )pbdoc");
+
+    m.def("set_num_threads", &set_num_threads, R"pbdoc(
+        set threshold function
+    )pbdoc");
+
     m.def("init", &init, R"pbdoc(
         init model
     )pbdoc");
