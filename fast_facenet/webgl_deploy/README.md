@@ -14,6 +14,8 @@ sudo bash ubuntu_install_core.sh
 sudo bash ubuntu_install_python.sh
 sudo bash ubuntu_install_python_package.sh
 sudo bash ubuntu_install_emscripten.sh
+sudo bash ubuntu_install_opengl.sh
+sudo bash ubuntu_install_opencl.sh
 ```
 
 ## Edit config.cmake
