@@ -16,6 +16,7 @@ sudo bash ubuntu_install_python_package.sh
 sudo bash ubuntu_install_emscripten.sh
 sudo bash ubuntu_install_opengl.sh
 sudo bash ubuntu_install_opencl.sh
+pip2 install mxnet --user
 cd ../../
 ```
 
