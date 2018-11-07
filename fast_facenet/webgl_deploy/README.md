@@ -1,5 +1,5 @@
 
-# How to Build
+# How to Build TVM with WebGL support
 
 ## Clone Source Code
 ```
