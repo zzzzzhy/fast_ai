@@ -16,6 +16,7 @@ sudo bash ubuntu_install_python_package.sh
 sudo bash ubuntu_install_emscripten.sh
 sudo bash ubuntu_install_opengl.sh
 sudo bash ubuntu_install_opencl.sh
+cd ../../
 ```
 
 ## Edit config.cmake
@@ -25,7 +26,7 @@ set(USE_ROCM OFF)
 set(USE_OPENCL ON)
 set(USE_METAL OFF)
 set(USE_VULKAN OFF)
-set(USE_OPENGL OFF)
+set(USE_OPENGL ON)
 set(USE_RPC ON)
 set(USE_GRAPH_RUNTIME ON)
 set(USE_GRAPH_RUNTIME_DEBUG OFF)
@@ -40,6 +41,8 @@ set(USE_MPS OFF)
 set(USE_ROCBLAS OFF)
 set(USE_SORT OFF)
 ```
+
+
 ```
 mkdir build
 cd build
