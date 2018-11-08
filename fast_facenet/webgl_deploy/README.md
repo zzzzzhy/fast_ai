@@ -61,5 +61,6 @@ cd python; python2 setup.py install --user; cd .. && \
 ## Build WebGL modules
 ```
 make web
+cp build/libtvm_web_runtime.* /home/build/.local/lib/python2.7/site-packages/tvm-0.4.0-py2.7-linux-x86_64.egg/tvm/
 ```
 
