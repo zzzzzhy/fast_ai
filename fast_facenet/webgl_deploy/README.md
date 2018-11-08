@@ -44,23 +44,22 @@ set(USE_MPS OFF)
 set(USE_ROCBLAS OFF)
 set(USE_SORT OFF)
 ```
-
-
+## Build TVM
 ```
 mkdir build
 cd build
 cmake ..
 make -j6
+cd ..
 ```
-
+## Install TVM Python2 packages
 ```
 cd python; python2 setup.py install --user; cd .. && \
     cd topi/python; python2 setup.py install --user; cd ../.. && \
     cd nnvm/python; python2 setup.py install --user; cd ../..
 ```
+## Build WebGL modules
+```
+make web
+```
 
-```
-cd python; python3 setup.py install --user; cd .. && \
-    cd topi/python; python3 setup.py install --user; cd ../.. && \
-    cd nnvm/python; python3 setup.py install --user; cd ../..
-```
