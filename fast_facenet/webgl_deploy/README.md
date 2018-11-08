@@ -14,6 +14,8 @@ sudo bash ubuntu_install_core.sh
 sudo bash ubuntu_install_python.sh
 sudo bash ubuntu_install_python_package.sh
 sudo bash ubuntu_install_emscripten.sh
+source /home/build/tvm/docker/install/emsdk-portable/emsdk_env.sh
+sudo cp /usr/lib/libgtest* /home/build/tvm/docker/install/emsdk-portable/clang/fastcomp/build_incoming_64/lib/
 sudo bash ubuntu_install_opengl.sh
 sudo bash ubuntu_install_opencl.sh
 pip2 install mxnet --user
@@ -47,9 +49,9 @@ set(USE_SORT OFF)
 ```
 mkdir build
 cd build
+cmake ..
+make -j6
 ```
-
-
 
 ```
 cd python; python2 setup.py install --user; cd .. && \
