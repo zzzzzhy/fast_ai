@@ -64,3 +64,13 @@ make web
 cp build/libtvm_web_runtime.* /home/build/.local/lib/python2.7/site-packages/tvm-0.4.0-py2.7-linux-x86_64.egg/tvm/
 ```
 
+## Hack it
+
+vi /home/build/.local/lib/python2.7/site-packages/tvm-0.4.0-py2.7-linux-x86_64.egg/tvm/contrib/emscripten.py. 
+Add `cmd += ["-s", "ERROR_ON_UNDEFINED_SYMBOLS=0"]`
+
+    if not side_module:
+        cmd += ["-s", "RESERVED_FUNCTION_POINTERS=2"]
+        cmd += ["-s", "NO_EXIT_RUNTIME=1"]
+        cmd += ["-s", "ERROR_ON_UNDEFINED_SYMBOLS=0"]
+
