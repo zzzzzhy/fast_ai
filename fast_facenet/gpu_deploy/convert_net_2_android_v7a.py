@@ -3,7 +3,7 @@ import mxnet as mx
 import nnvm
 import tvm
 import numpy as np
-from tvm.contrib import util, ndk
+#from tvm.contrib import util, ndk
 
 def get_feature(self, aligned):
   #face_img is bgr image
@@ -20,7 +20,8 @@ def convert(net, params, data_shape, dtype, target_host):
             net, tvm.target.mali(), shape={"data": data_shape}, params=params,
             dtype=dtype, target_host=target_host)
 
-    lib.export_library('./net2.so',ndk.create_shared)
+    #lib.export_library('./net2.so',ndk.create_shared)
+    lib.export_library('./net2.tar')
 
     with open("./net2", "w") as fo:
         fo.write(graph.json())
@@ -30,4 +31,5 @@ def convert(net, params, data_shape, dtype, target_host):
 net, params, auxs = mx.model.load_checkpoint('./model-r50-am-lfw/model', 0)
 nnvm_net, nnvm_params = nnvm.frontend.from_mxnet(net, params, auxs)
 
-convert(nnvm_net, nnvm_params, (1, 3, 112, 112) ,'float32','llvm --system-lib -target=armv7a-linux-android -mattr=+neon,+vfp3') # -mattr=+neon -mattr=+vfp3 -mfloat-abi=hard')
+#convert(nnvm_net, nnvm_params, (1, 3, 112, 112) ,'float32','llvm -system-lib -mfloat-abi=soft -target=armv7-a-linux-android -mattr=+soft-float') # -mattr=+neon,+vfp3') # -mattr=+neon -mattr=+vfp3 -mfloat-abi=hard')
+convert(nnvm_net, nnvm_params, (1, 3, 112, 112) ,'float32','llvm -mfloat-abi=soft -target=armv7-a-linux-android ') # -mattr=+neon,+vfp3') # -mattr=+neon -mattr=+vfp3 -mfloat-abi=hard')
