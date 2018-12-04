@@ -132,9 +132,9 @@ std::string detect(std::string imagepath) {
     struct timezone tz1,tz2;
     std::vector<Bbox> finalBbox;
     int detected = 0;
-    IplImage* img = cvLoadImage(imagepath.c_str());
-    cv::Mat cv_img = cv::cvarrToMat(img);//Mat(img);
-    //cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
+    //IplImage* img = cvLoadImage(imagepath.c_str());
+    //cv::Mat cv_img = cv::cvarrToMat(img);//Mat(img);
+    cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty()) {
         std::cerr << "cv::Imread failed. File Path: " << imagepath << std::endl;
         return "{\"result\":[]}";
