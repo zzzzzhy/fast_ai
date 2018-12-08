@@ -171,6 +171,8 @@ std::string detect(std::string imagepath) {
     #ifdef __DEBUG__
     printf( "%s = %g ms \n ", "Detection time", getElapse(&tv1, &tv2) );
     #endif
+    ncnn_img.release();
+    cv_img.release();
     return result.str();
 }
 PYBIND11_MODULE(face_detection, m) {

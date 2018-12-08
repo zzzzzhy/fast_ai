@@ -5,6 +5,9 @@
 #include <pybind11/stl.h>
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/types_c.h>
+#include <opencv2/imgcodecs/imgcodecs_c.h>
+
 #include "utils.h"
 #include "mtcnn.h"
 
@@ -129,6 +132,8 @@ std::string detect(std::string imagepath) {
     struct timezone tz1,tz2;
     std::vector<Bbox> finalBbox;
     int detected = 0;
+    //IplImage* img = cvLoadImage(imagepath.c_str());
+    //cv::Mat cv_img = cv::cvarrToMat(img);//Mat(img);
     cv::Mat cv_img = cv::imread(imagepath, CV_LOAD_IMAGE_COLOR);
     if (cv_img.empty()) {
         std::cerr << "cv::Imread failed. File Path: " << imagepath << std::endl;
