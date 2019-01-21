@@ -1,0 +1,19 @@
+1. prepare tvm docker, 
+$docker run -v /opt/yunhai/sharpai/human_body_model/test:/export -it solderzzc/rocketchat:tvm_06152018_x86 /bin/bash
+
+2. reid model
+  run in TVM docker, 
+  $docker run -v /opt/yunhai/sharpai/human_body_model/test:/export -it solderzzc/rocketchat:tvm_06152018_x86 /bin/bash	
+ 
+  convert mxnet models to tvm models, reid, reid.tar, reid.params
+  convert_from_mxnet_to_tvm.py
+
+3. yolo model
+  run in TVM docker
+
+  $docker run -v /opt/yunhai/sharpai/human_body_model/test:/export -it solderzzc/rocketchat:tvm_06152018_x86 /bin/bash
+
+  convert yolo models to tvm models, yolo, yolo.tar, yolo.params
+  convert_yolo_to_tvm.py
+
+  compile _convert.so in convert directory on board. 
