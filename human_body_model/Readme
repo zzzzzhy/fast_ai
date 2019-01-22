@@ -17,3 +17,6 @@ $docker run -v /opt/yunhai/sharpai/human_body_model/test:/export -it solderzzc/r
   convert_yolo_to_tvm.py
 
   compile _convert.so in convert directory on board. 
+4. REID Code
+
+  https://github.com/xiaolai-sqlai/gluon-reid
