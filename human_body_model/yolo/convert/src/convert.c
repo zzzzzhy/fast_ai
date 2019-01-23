@@ -114,8 +114,8 @@ char* id;
 
 
 void init_darknet(void){
-    net = load_network("od.cfg", NULL, 0);
-    id = basecfg("od.cfg");
+    net = load_network("/root/od.cfg", NULL, 0);
+    id = basecfg("/root/od.cfg");
     l = net->layers[net->n-1];
     classes = l.classes;
 }
