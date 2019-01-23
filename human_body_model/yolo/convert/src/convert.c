@@ -5,7 +5,8 @@
 
 const char *voc_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 
-char * print_detector_detections(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
+
+char * print_detector_detections_old(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
 {
     int i, j;
     char tmp[20*2048];
@@ -24,6 +25,30 @@ char * print_detector_detections(char *id, box *boxes, float **probs, int total,
         for(j = 0; j < classes; ++j){
             if (probs[i][j]) sprintf(tmp,"%s %s %f %f %f %f %f\n",tmp, voc_names[j], probs[i][j],
                     xmin, ymin, xmax, ymax);
+        }
+    }
+    return strdup(tmp);
+}
+
+char * print_detector_detections(char *id, box *boxes, float **probs, int total, int classes, int w, int h)
+{
+    int i, j;
+    char tmp[20*2048];
+    tmp[0] = 0;
+    for(i = 0; i < total; ++i){
+        float xmin = (boxes[i].x - boxes[i].w/2.)*w ;//+ 1;
+        float xmax = (boxes[i].x + boxes[i].w/2.)*w ;//+ 1;
+        float ymin = (boxes[i].y - boxes[i].h/2.)*h ;//+ 1;
+        float ymax = (boxes[i].y + boxes[i].h/2.)*h ;//+ 1;
+
+        if (xmin < 0) xmin = 0;
+        if (ymin < 0) ymin = 0;
+        if (xmax > w -1) xmax = w-1;
+        if (ymax > h -1) ymax = h-1;
+
+        for(j = 0; j < classes; ++j){
+            if (probs[i][j]) sprintf(tmp,"%s %s %f %d %d %d %d\n",tmp, voc_names[j], probs[i][j],
+                    (int)xmin, (int)ymin, (int)xmax, (int)ymax);
         }
     }
     return strdup(tmp);
@@ -89,8 +114,8 @@ char* id;
 
 
 void init_darknet(void){
-    net = load_network("/root/od.cfg", NULL, 0);
-    id = basecfg("/root/od.cfg");
+    net = load_network("od.cfg", NULL, 0);
+    id = basecfg("od.cfg");
     l = net->layers[net->n-1];
     classes = l.classes;
 }
