@@ -12,8 +12,8 @@ with open('src/convert.c') as my_source:
         ffi.set_source(
             '_convert',
             my_source.read(),
-            extra_compile_args=['-pedantic', '-Wall', '-g', '-O0','-I/root/darknet/include'],
-            extra_link_args=['-ldarknet']
+            extra_compile_args=['-pedantic', '-Wall', '-g', '-O0','-I../darknet/include'],
+            extra_link_args=['-L../darknet/lib','-ldarknet']
         )
     else:
         print('Building for performance without OpenMP...')
