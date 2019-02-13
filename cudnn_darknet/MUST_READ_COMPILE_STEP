@@ -1,0 +1,6 @@
+steps compile in PC with cudnn support
+1) install CUDA 9
+2) export PATH=/usr/local/cuda/bin:$PATH
+3) sudo apt install gcc-6 g++-6
+4) sudo ln -s /usr/bin/gcc-6 /usr/local/cuda/bin/gcc
+5) sudo ln -s /usr/bin/g++-6 /usr/local/cuda/bin/g++
